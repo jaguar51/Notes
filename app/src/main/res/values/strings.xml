@@ -3,4 +3,6 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="text">Введите текст заметки</string>
+    <string name="subject">Введите заголовок</string>
 </resources>
