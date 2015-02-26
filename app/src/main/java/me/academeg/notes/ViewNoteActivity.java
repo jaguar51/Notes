@@ -17,7 +17,6 @@ public class ViewNoteActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_note);
 
-
         Intent intent = getIntent();
         ((EditText) findViewById(R.id.subjectTxt)).setText(intent.getStringExtra("subject"));
         ((EditText) findViewById(R.id.noteTxt)).setText(intent.getStringExtra("text"));
