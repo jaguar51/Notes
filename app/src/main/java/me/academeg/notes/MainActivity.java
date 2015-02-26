@@ -1,9 +1,12 @@
 package me.academeg.notes;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -31,6 +34,14 @@ public class MainActivity extends ActionBarActivity {
         notesAdapter = new NotesAdapter(this, notes);
         notesList.setAdapter(notesAdapter);
 
+        notesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
+                
+                startActivity(intent);
+            }
+        });
     }
 
 
