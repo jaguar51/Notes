@@ -38,7 +38,9 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
-                
+                Note tmp = notesAdapter.getItem(position);
+                intent.putExtra("subject", tmp.getSubject());
+                intent.putExtra("text", tmp.getText());
                 startActivity(intent);
             }
         });
