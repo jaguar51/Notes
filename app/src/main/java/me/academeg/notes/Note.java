@@ -6,8 +6,10 @@ package me.academeg.notes;
 public class Note {
     private String subject;
     private String text;
+    private long id;
 
-    Note(String sub, String txt) {
+    Note(long _id, String sub, String txt) {
+        id = _id;
         subject = sub;
         text = txt;
     }
@@ -26,5 +28,13 @@ public class Note {
 
     public void setText(String txt) {
         text = txt;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    private void setId(long _id) {
+        id = _id;
     }
 }
