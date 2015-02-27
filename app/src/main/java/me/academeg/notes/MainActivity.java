@@ -65,15 +65,23 @@ public class MainActivity extends ActionBarActivity {
                 case REQUEST_CODE_EDIT_NOTE:
                     tmpNote.setText(data.getStringExtra("text"));
                     tmpNote.setSubject(data.getStringExtra("subject"));
-                    //Log.d("myLog", "text="+tmpNote.getText()+"  id="+tmpNote.getId());
                     for (int i = 0; i < notes.size(); i++) {
                         if(notes.get(i).getId() == tmpNote.getId()) {
+                            if (tmpNote.getText().isEmpty() && tmpNote.getSubject().isEmpty()) {
+                                notes.remove(i);
+                                notesAdapter.notifyDataSetChanged();
+                                break;
+                            }
                             notes.get(i).setSubject(tmpNote.getSubject());
                             notes.get(i).setText(tmpNote.getText());
                             break;
                         }
                     }
                     notesAdapter.notifyDataSetChanged();
+                    break;
+
+                case REQUEST_CODE_CREATE_NOTE:
+
                     break;
             }
         }
