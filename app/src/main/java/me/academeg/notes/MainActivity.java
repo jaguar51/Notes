@@ -55,6 +55,7 @@ public class MainActivity extends ActionBarActivity {
                 startActivityForResult(intent, REQUEST_CODE_EDIT_NOTE);
             }
         });
+
     }
 
     @Override
@@ -64,7 +65,7 @@ public class MainActivity extends ActionBarActivity {
                 case REQUEST_CODE_EDIT_NOTE:
                     tmpNote.setText(data.getStringExtra("text"));
                     tmpNote.setSubject(data.getStringExtra("subject"));
-                    Log.d("myLog", "text="+tmpNote.getText()+"  id="+tmpNote.getId());
+                    //Log.d("myLog", "text="+tmpNote.getText()+"  id="+tmpNote.getId());
                     for (int i = 0; i < notes.size(); i++) {
                         if(notes.get(i).getId() == tmpNote.getId()) {
                             notes.get(i).setSubject(tmpNote.getSubject());
@@ -115,6 +116,7 @@ public class MainActivity extends ActionBarActivity {
             notesAdapter.notifyDataSetChanged();
             return true;
         }
+
         return super.onContextItemSelected(item);
     }
 
