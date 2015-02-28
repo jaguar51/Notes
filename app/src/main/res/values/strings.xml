@@ -2,8 +2,9 @@
     <string name="app_name">Notes</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Настройки</string>
     <string name="text">Введите текст заметки</string>
     <string name="subject">Введите заголовок</string>
     <string name="deleteNote">Удалить заметку</string>
+    <string name="createNote">Саздать заметку</string>
 </resources>

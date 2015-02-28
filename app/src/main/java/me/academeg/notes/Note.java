@@ -8,6 +8,12 @@ public class Note {
     private String text;
     private long id;
 
+    Note (long _id) {
+        id = _id;
+        subject = "";
+        text = "";
+    }
+
     Note(long _id, String sub, String txt) {
         id = _id;
         subject = sub;
