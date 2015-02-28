@@ -83,7 +83,7 @@ public class MainActivity extends ActionBarActivity {
                 case REQUEST_CODE_CREATE_NOTE:
                     tmpNote.setSubject(data.getStringExtra("subject"));
                     tmpNote.setText(data.getStringExtra("text"));
-                    if (!tmpNote.getText().isEmpty() && !tmpNote.getSubject().isEmpty()) {
+                    if (!tmpNote.getText().isEmpty() || !tmpNote.getSubject().isEmpty()) {
                         notes.add(tmpNote);
                         notesAdapter.notifyDataSetChanged();
                     }
