@@ -81,7 +81,12 @@ public class MainActivity extends ActionBarActivity {
                     break;
 
                 case REQUEST_CODE_CREATE_NOTE:
-
+                    tmpNote.setSubject(data.getStringExtra("subject"));
+                    tmpNote.setText(data.getStringExtra("text"));
+                    if (!tmpNote.getText().isEmpty() && !tmpNote.getSubject().isEmpty()) {
+                        notes.add(tmpNote);
+                        notesAdapter.notifyDataSetChanged();
+                    }
                     break;
             }
         }
@@ -103,6 +108,19 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+
+        if (id == R.id.createNote) {
+            long maxId = 0;
+            for (int i = 0; i < notes.size(); i++)
+                if (notes.get(i).getId() > maxId)
+                    maxId = notes.get(i).getId();
+            maxId += 1;
+            Log.d("myLog", String.valueOf(maxId));
+            tmpNote = new Note(maxId);
+            Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
+            startActivityForResult(intent, REQUEST_CODE_CREATE_NOTE);
             return true;
         }
 
