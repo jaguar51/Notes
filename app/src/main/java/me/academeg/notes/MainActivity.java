@@ -12,7 +12,22 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.util.ArrayList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -26,6 +41,8 @@ public class MainActivity extends ActionBarActivity {
 
     private final int CM_DELET = 1;
 
+    private final String FILE_NAME = "notes";
+
     private Note tmpNote;
 
     @Override
@@ -33,12 +50,14 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        notes.add(new Note(1,"1", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\ntempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\nquis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\nconsequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\ncillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\nproident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
+
+        /*notes.add(new Note(1,"1", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\ntempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\nquis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\nconsequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\ncillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\nproident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
         notes.add(new Note(2,"2", "Test 2"));
         notes.add(new Note(3,"3", "Test 3"));
         notes.add(new Note(4,"5", "Test 5"));
-        notes.add(new Note(5,"4", "Test 4"));
+        notes.add(new Note(5,"4", "Test 4"));*/
 
+        readNotesFromFile();
 
         notesList = (ListView) findViewById(R.id.notesListView);
         notesAdapter = new NotesAdapter(this, notes);
@@ -77,6 +96,7 @@ public class MainActivity extends ActionBarActivity {
                             break;
                         }
                     }
+                    writeNotesToFile();
                     notesAdapter.notifyDataSetChanged();
                     break;
 
@@ -85,6 +105,7 @@ public class MainActivity extends ActionBarActivity {
                     tmpNote.setText(data.getStringExtra("text"));
                     if (!tmpNote.getText().isEmpty() || !tmpNote.getSubject().isEmpty()) {
                         notes.add(tmpNote);
+                        writeNotesToFile();
                         notesAdapter.notifyDataSetChanged();
                     }
                     break;
@@ -139,11 +160,78 @@ public class MainActivity extends ActionBarActivity {
         if (item.getItemId() == CM_DELET) {
             AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             notes.remove(acmi.position);
+            writeNotesToFile();
             notesAdapter.notifyDataSetChanged();
             return true;
         }
 
         return super.onContextItemSelected(item);
+    }
+
+
+    public void writeNotesToFile() {
+        try {
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+                    openFileOutput(FILE_NAME, MODE_PRIVATE)
+            ));
+
+            bw.write("<data>");
+            for (int i = 0; i < notes.size(); i++) {
+                bw.write("<note>");
+
+                /*Log.d("writeToFile", "<id>" + String.valueOf(notes.get(i).getId()) + "</id>");
+                Log.d("writeToFile", "<subject>" + notes.get(i).getSubject() + "</subject>");
+                Log.d("writeToFile", "<text>" + notes.get(i).getText() + "</text>");*/
+
+                bw.write("<id>" + String.valueOf(notes.get(i).getId()) + "</id>");
+                bw.write("<subject>" + notes.get(i).getSubject() + "</subject>");
+                bw.write("<text>" + notes.get(i).getText() + "</text>");
+                bw.write("</note>");
+            }
+            bw.write("</data>");
+
+            bw.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void readNotesFromFile() {
+        try {
+            notes.clear();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    openFileInput(FILE_NAME)));
+            String file = "";
+            String tmp;
+            while ((tmp = br.readLine()) != null)
+                file += "\n" + tmp;
+            br.close();
+
+            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            InputSource is = new InputSource();
+            is.setCharacterStream(new StringReader(file));
+            Document doc = db.parse(is);
+
+            NodeList nodeLst = doc.getElementsByTagName("note");
+            Log.d("sizeNodeList", String.valueOf(nodeLst.getLength()));
+            for (int i = 0; i < nodeLst.getLength(); i++) {
+                Node fstNode = nodeLst.item(i);
+                if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element fstElem = (Element) fstNode;
+                    Note tmNote = new Note(Long.parseLong(((Element)(fstElem.getElementsByTagName("id").item(0))).getTextContent()));
+                    tmNote.setSubject(((Element)(fstElem.getElementsByTagName("subject").item(0))).getTextContent());
+                    tmNote.setText(((Element)(fstElem.getElementsByTagName("text").item(0))).getTextContent());
+                    notes.add(tmNote);
+                }
+            }
+
+        }
+        catch (Exception e) {
+            Log.d("Error", "reading");
+            e.printStackTrace();
+        }
     }
 
 }
