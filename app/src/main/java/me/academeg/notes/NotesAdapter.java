@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class NotesAdapter extends BaseAdapter {
     private Context ctx;
     protected LayoutInflater lInflater;
-    private ArrayList<Note> objects;
+    protected ArrayList<Note> objects;
 
     NotesAdapter(Context context, ArrayList<Note> notes) {
         ctx = context;
@@ -55,7 +55,8 @@ public class NotesAdapter extends BaseAdapter {
 
     protected String cutText(String txt) {
         String res = txt.substring(0, (txt.length() < 35 ? txt.length() : 35));
-        res.replaceAll("\\n", "");
+        //res.replaceAll('\n', ' ');
+        res.replace('\n', ' ');
         if (txt.length() >= 35) res += "...";
         return res;
     }
