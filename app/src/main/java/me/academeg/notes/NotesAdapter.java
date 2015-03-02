@@ -13,9 +13,9 @@ import java.util.ArrayList;
  * Created by TM on 26.02.2015.
  */
 public class NotesAdapter extends BaseAdapter {
-    Context ctx;
-    LayoutInflater lInflater;
-    ArrayList<Note> objects;
+    private Context ctx;
+    protected LayoutInflater lInflater;
+    private ArrayList<Note> objects;
 
     NotesAdapter(Context context, ArrayList<Note> notes) {
         ctx = context;
@@ -53,7 +53,7 @@ public class NotesAdapter extends BaseAdapter {
         return view;
     }
 
-    private String cutText(String txt) {
+    protected String cutText(String txt) {
         String res = txt.substring(0, (txt.length() < 35 ? txt.length() : 35));
         res.replaceAll("\\n", "");
         if (txt.length() >= 35) res += "...";

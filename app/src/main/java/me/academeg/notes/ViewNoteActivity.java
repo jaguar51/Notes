@@ -13,18 +13,32 @@ import android.widget.EditText;
  */
 
 public class ViewNoteActivity extends ActionBarActivity {
+    private final int REQUEST_CODE_LINK_NOTES = 1;
+
     private long noteID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_note);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //back button in action bar
 
         Intent intent = getIntent();
         noteID = intent.getLongExtra("id", -1);
         ((EditText) findViewById(R.id.subjectTxt)).setText(intent.getStringExtra("subject"));
         ((EditText) findViewById(R.id.noteTxt)).setText(intent.getStringExtra("text"));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //back button in action bar
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_CODE_LINK_NOTES:
+
+                    break;
+            }
+        }
     }
 
     @Override
@@ -48,15 +62,17 @@ public class ViewNoteActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            Log.d("mylog", "back pressed");
+            //Log.d("mylog", "back pressed");
             onBackPressed();
             return true;
         }
 
         if (id == R.id.linkNote) {
             Log.d("myLog", "Добавляем ссылки");
-            Intent intent = new Intent(ViewNoteActivity.this, ViewLinkedNote.class);
+            Intent intent = new Intent(ViewNoteActivity.this, ViewLinkedNoteActivity.class);
+            intent.putExtra("id", noteID);
             startActivity(intent);
+            //startActivityForResult(intent, REQUEST_CODE_LINK_NOTES);
         }
 
         return super.onOptionsItemSelected(item);
