@@ -50,13 +50,6 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        /*notes.add(new Note(1,"1", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\ntempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\nquis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\nconsequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\ncillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\nproident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
-        notes.add(new Note(2,"2", "Test 2"));
-        notes.add(new Note(3,"3", "Test 3"));
-        notes.add(new Note(4,"5", "Test 5"));
-        notes.add(new Note(5,"4", "Test 4"));*/
-
         readNotesFromFile();
 
         notesList = (ListView) findViewById(R.id.notesListView);
@@ -69,6 +62,7 @@ public class MainActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
                 tmpNote = notesAdapter.getItem(position);
+                intent.putExtra("id", tmpNote.getId());
                 intent.putExtra("subject", tmpNote.getSubject());
                 intent.putExtra("text", tmpNote.getText());
                 startActivityForResult(intent, REQUEST_CODE_EDIT_NOTE);
@@ -215,7 +209,7 @@ public class MainActivity extends ActionBarActivity {
             Document doc = db.parse(is);
 
             NodeList nodeLst = doc.getElementsByTagName("note");
-            Log.d("sizeNodeList", String.valueOf(nodeLst.getLength()));
+            //Log.d("sizeNodeList", String.valueOf(nodeLst.getLength()));
             for (int i = 0; i < nodeLst.getLength(); i++) {
                 Node fstNode = nodeLst.item(i);
                 if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -226,7 +220,6 @@ public class MainActivity extends ActionBarActivity {
                     notes.add(tmNote);
                 }
             }
-
         }
         catch (Exception e) {
             Log.d("Error", "reading");

@@ -7,4 +7,5 @@
     <string name="subject">Введите заголовок</string>
     <string name="deleteNote">Удалить заметку</string>
     <string name="createNote">Саздать заметку</string>
+    <string name="linksNote">Связать</string>
 </resources>
