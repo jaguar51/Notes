@@ -17,8 +17,10 @@ import org.xml.sax.InputSource;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,11 +28,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class ViewLinkedNoteActivity extends ActionBarActivity {
     private final String FILE_NAME = "notes";
+    private final String FILE_NAME_LINKS = "links";
 
     private long noteID;
     private ArrayList<Note> notes = new ArrayList<Note>();
     private NotesLinksAdapter notesLinksAdapter;
     private ListView notesList;
+    private ArrayList<Pair<Long, Long>> linkNote = new ArrayList<Pair<Long, Long>>(); // пары связей
+    private ArrayList<Long> thisLinks = new ArrayList<Long>(); // связи для нашей заметки(noteID)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +47,7 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
         noteID = intent.getLongExtra("id", -1);
 
         readNotesFromFile();
+        readLinksFromFile();
 
         notesList = (ListView) findViewById(R.id.linkedNotesListView);
         //notesLinksAdapter = new NotesLinksAdapter(this, notes);
@@ -75,7 +81,6 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            //Log.d("mylog", "back pressed");
             onBackPressed();
             return true;
         }
@@ -121,13 +126,54 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
         }
     }
 
-
-
     public void readLinksFromFile() {
+        try {
+            thisLinks.clear();
+            linkNote.clear();
 
+            Scanner inputLink = new Scanner(openFileInput(FILE_NAME_LINKS));
+            while (inputLink.hasNext()) {
+                long first = inputLink.nextLong();
+                long second = inputLink.nextLong();
+                Log.d("testRead", String.valueOf(first) + " " + String.valueOf(second));
+                if(first == noteID) {
+                    thisLinks.add(second);
+                    continue;
+                }
+                if(second == noteID) {
+                    thisLinks.add(first);
+                    continue;
+                }
+                linkNote.add(Pair.create(first, second));
+            }
+            inputLink.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void writeLinksToFile() {
+        try {
+            PrintWriter outputLink = new PrintWriter(openFileOutput(
+                    FILE_NAME_LINKS, MODE_PRIVATE));
 
+            for (int i = 0; i < linkNote.size(); i++) {
+                outputLink.print(linkNote.get(i).first);
+                outputLink.print(" ");
+                outputLink.println(linkNote.get(i).second);
+            }
+
+            for (int i = 0; i < thisLinks.size(); i++) {
+                outputLink.print(thisLinks.get(i));
+                outputLink.print(" ");
+                outputLink.println(noteID);
+            }
+
+            outputLink.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
