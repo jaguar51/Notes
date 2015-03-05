@@ -45,16 +45,14 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
         noteID = intent.getLongExtra("id", -1);
+        Log.d("checkID", String.valueOf(noteID));
 
         readNotesFromFile();
         readLinksFromFile();
 
         notesList = (ListView) findViewById(R.id.linkedNotesListView);
-        //notesLinksAdapter = new NotesLinksAdapter(this, notes);
-
-        NotesAdapter notesAdapter = new NotesAdapter(this, notes);
-        notesList.setAdapter(notesAdapter);
-
+        notesLinksAdapter = new NotesLinksAdapter(this, notes, thisLinks, noteID);
+        notesList.setAdapter(notesLinksAdapter);
     }
 
 
@@ -64,6 +62,7 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
         intent.putExtra("subject", ((EditText) findViewById(R.id.subjectTxt)).getText().toString());
         intent.putExtra("text", ((EditText) findViewById(R.id.noteTxt)).getText().toString());
         setResult(RESULT_OK, intent);*/
+        writeLinksToFile();
         finish();
     }
 
@@ -135,7 +134,7 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
             while (inputLink.hasNext()) {
                 long first = inputLink.nextLong();
                 long second = inputLink.nextLong();
-                Log.d("testRead", String.valueOf(first) + " " + String.valueOf(second));
+                //Log.d("testRead", String.valueOf(first) + " " + String.valueOf(second));
                 if(first == noteID) {
                     thisLinks.add(second);
                     continue;

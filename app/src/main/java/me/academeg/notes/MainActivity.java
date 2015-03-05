@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -23,8 +24,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -135,6 +138,7 @@ public class MainActivity extends ActionBarActivity {
             Log.d("myLog", String.valueOf(maxId));
             tmpNote = new Note(maxId);
             Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
+            intent.putExtra("id", tmpNote.getId());
             startActivityForResult(intent, REQUEST_CODE_CREATE_NOTE);
             return true;
         }
@@ -153,6 +157,7 @@ public class MainActivity extends ActionBarActivity {
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getItemId() == CM_DELET) {
             AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            removeLinksFromFile(notes.get(acmi.position).getId());
             notes.remove(acmi.position);
             writeNotesToFile();
             notesAdapter.notifyDataSetChanged();
@@ -162,6 +167,33 @@ public class MainActivity extends ActionBarActivity {
         return super.onContextItemSelected(item);
     }
 
+    public void removeLinksFromFile(long noteID) {
+        ArrayList<Pair<Long, Long>> linkNote = new ArrayList<Pair<Long, Long>>();
+
+        try {
+            linkNote.clear();
+            Scanner inputLink = new Scanner(openFileInput("links"));
+            while (inputLink.hasNext()) {
+                long first = inputLink.nextLong();
+                long second = inputLink.nextLong();
+                if (first != noteID && second != noteID)
+                    linkNote.add(Pair.create(first, second));
+            }
+            inputLink.close();
+
+            PrintWriter outputLink = new PrintWriter(openFileOutput(
+                    "links", MODE_PRIVATE));
+            for (int i = 0; i < linkNote.size(); i++) {
+                outputLink.print(linkNote.get(i).first);
+                outputLink.print(" ");
+                outputLink.println(linkNote.get(i).second);
+            }
+            outputLink.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public void writeNotesToFile() {
         try {
@@ -172,11 +204,6 @@ public class MainActivity extends ActionBarActivity {
             bw.write("<data>");
             for (int i = 0; i < notes.size(); i++) {
                 bw.write("<note>");
-
-                /*Log.d("writeToFile", "<id>" + String.valueOf(notes.get(i).getId()) + "</id>");
-                Log.d("writeToFile", "<subject>" + notes.get(i).getSubject() + "</subject>");
-                Log.d("writeToFile", "<text>" + notes.get(i).getText() + "</text>");*/
-
                 bw.write("<id>" + String.valueOf(notes.get(i).getId()) + "</id>");
                 bw.write("<subject>" + notes.get(i).getSubject() + "</subject>");
                 bw.write("<text>" + notes.get(i).getText() + "</text>");
