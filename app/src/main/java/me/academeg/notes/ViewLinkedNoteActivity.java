@@ -1,5 +1,6 @@
 package me.academeg.notes;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -7,6 +8,8 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.w3c.dom.Document;
@@ -53,6 +56,18 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
         notesList = (ListView) findViewById(R.id.linkedNotesListView);
         notesLinksAdapter = new NotesLinksAdapter(this, notes, thisLinks, noteID);
         notesList.setAdapter(notesLinksAdapter);
+
+        notesList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ViewLinkedNoteActivity.this);
+                Note tmpNote = notesLinksAdapter.getItem(position);
+                builder.setTitle(tmpNote.getSubject());
+                builder.setMessage(tmpNote.getText());
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
     }
 
 

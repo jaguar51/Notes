@@ -55,7 +55,7 @@ public class NotesAdapter extends BaseAdapter {
 
     protected String cutText(String txt) {
         String res = txt.substring(0, (txt.length() < 35 ? txt.length() : 35));
-        res.replace('\n', ' ');
+        res = res.replace('\n', ' ');
         if (txt.length() >= 35) res += "...";
         return res;
     }
