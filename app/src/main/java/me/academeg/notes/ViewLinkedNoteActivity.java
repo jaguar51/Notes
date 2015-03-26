@@ -73,10 +73,6 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        /*Intent intent = new Intent();
-        intent.putExtra("subject", ((EditText) findViewById(R.id.subjectTxt)).getText().toString());
-        intent.putExtra("text", ((EditText) findViewById(R.id.noteTxt)).getText().toString());
-        setResult(RESULT_OK, intent);*/
         writeLinksToFile();
         finish();
     }

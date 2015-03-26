@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="action_settings">Настройки</string>
+    <string name="createNote">Создать заметку</string>
+    <string name="deleteNote">Удалить заметку</string>
+    <string name="linksNote">Связать</string>
+    <string name="subject">Введите заголовок</string>
+    <string name="text">Введите текст заметки</string>
+
+</resources>
