@@ -1,11 +1,10 @@
 <resources>
     <string name="app_name">Notes</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Настройки</string>
-    <string name="text">Введите текст заметки</string>
-    <string name="subject">Введите заголовок</string>
-    <string name="deleteNote">Удалить заметку</string>
-    <string name="createNote">Создать заметку</string>
-    <string name="linksNote">Связать</string>
+    <string name="action_settings">Settings</string>
+    <string name="text">Write the note</string>
+    <string name="subject">Note title</string>
+    <string name="deleteNote">Delete the note</string>
+    <string name="createNote">Create the note</string>
+    <string name="linksNote">Connect</string>
 </resources>
