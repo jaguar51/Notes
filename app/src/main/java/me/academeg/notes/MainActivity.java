@@ -134,7 +134,7 @@ public class MainActivity extends ActionBarActivity {
                 if (notes.get(i).getId() > maxId)
                     maxId = notes.get(i).getId();
             maxId += 1;
-            Log.d("myLog", String.valueOf(maxId));
+            //Log.d("myLog", String.valueOf(maxId));
             tmpNote = new Note(maxId);
             Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
             intent.putExtra("id", tmpNote.getId());
