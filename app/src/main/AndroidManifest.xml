@@ -24,6 +24,15 @@
             android:name=".ViewLinkedNoteActivity"
             android:label="@string/app_name" >
         </activity>
+
+        <uses-feature
+            android:name="android.hardware.camera"
+            android:required="true" />
+
+        <activity
+            android:name=".AddPhotosActivity"
+            android:label="@string/title_activity_add_photos" >
+        </activity>
     </application>
 
 </manifest>

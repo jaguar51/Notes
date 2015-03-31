@@ -8,4 +8,8 @@
         app:showAsAction="always"
         android:title="@string/linksNote">
     </item>
+    <item
+        android:id="@+id/addPhoto"
+        android:title="@string/addPhoto">
+    </item>
 </menu>

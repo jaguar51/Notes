@@ -2,6 +2,7 @@ package me.academeg.notes;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,7 +18,7 @@ import android.widget.EditText;
 
 public class ViewNoteActivity extends ActionBarActivity {
     private final int REQUEST_CODE_LINK_NOTES = 1;
-
+    private static final int REQUEST_TAKE_PHOTO = 2;
     private long noteID;
 
     @Override
@@ -36,10 +37,13 @@ public class ViewNoteActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case REQUEST_CODE_LINK_NOTES:
+            if (requestCode == REQUEST_CODE_LINK_NOTES) {
 
-                    break;
+            }
+
+            if(requestCode==REQUEST_TAKE_PHOTO) {
+                Log.d("myLog", "Photo gets");
+                
             }
         }
     }
@@ -65,7 +69,6 @@ public class ViewNoteActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            //Log.d("mylog", "back pressed");
             onBackPressed();
             return true;
         }
@@ -76,6 +79,12 @@ public class ViewNoteActivity extends ActionBarActivity {
             intent.putExtra("id", noteID);
             startActivity(intent);
             //startActivityForResult(intent, REQUEST_CODE_LINK_NOTES);
+        }
+
+        if (id == R.id.addPhoto) {
+            Intent takePictureIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            takePictureIntent.setType("image/*");
+            startActivityForResult(Intent.createChooser(takePictureIntent, getResources().getString(R.string.selectFile)), REQUEST_TAKE_PHOTO);
         }
 
         return super.onOptionsItemSelected(item);
