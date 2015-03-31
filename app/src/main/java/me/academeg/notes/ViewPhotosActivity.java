@@ -3,21 +3,25 @@ package me.academeg.notes;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import java.io.File;
 import java.io.IOException;
 
 
 public class ViewPhotosActivity extends ActionBarActivity {
     private long noteID;
     static final int GALLERY_REQUEST = 1;
-    ImageView myImageView;
+    Uri selectedImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +32,18 @@ public class ViewPhotosActivity extends ActionBarActivity {
         Intent intent = getIntent();
         noteID = intent.getLongExtra("id", -1);
 
-        myImageView = (ImageView) findViewById(R.id.imageView);
+        ((Button)findViewById(R.id.button)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in = new Intent();
+                in.setAction(Intent.ACTION_VIEW);
+                in.setDataAndType(selectedImage, "image/*");
+                startActivity(in);
+                
+
+            }
+        });
+        //myImageView = (ImageView) findViewById(R.id.imageView);
     }
 
 
@@ -39,14 +54,14 @@ public class ViewPhotosActivity extends ActionBarActivity {
         if (resultCode == RESULT_OK) {
             if(requestCode == GALLERY_REQUEST) {
                 Bitmap galleryPic = null;
-                Uri selectedImage = imageReturnedIntent.getData();
+                selectedImage = imageReturnedIntent.getData();
                 try {
                     galleryPic = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
                 }
                 catch (IOException e) {
                     e.printStackTrace();
                 }
-                myImageView.setImageBitmap(galleryPic);
+                //myImageView.setImageBitmap(galleryPic);
             }
         }
 
@@ -84,4 +99,5 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
