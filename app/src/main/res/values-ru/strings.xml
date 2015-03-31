@@ -6,5 +6,7 @@
     <string name="linksNote">Связать</string>
     <string name="subject">Введите заголовок</string>
     <string name="text">Введите текст заметки</string>
+    <string name="addPhoto">Добавить фотографию</string>
+    <string name="selectFile">Выберите файл</string>
 
 </resources>

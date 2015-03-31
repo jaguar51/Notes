@@ -83,6 +83,7 @@ public class MainActivity extends ActionBarActivity {
                     for (int i = 0; i < notes.size(); i++) {
                         if(notes.get(i).getId() == tmpNote.getId()) {
                             if (tmpNote.getText().isEmpty() && tmpNote.getSubject().isEmpty()) {
+                                //removeLinksFromFile(notes.get(i).getId());
                                 notes.remove(i);
                                 notesAdapter.notifyDataSetChanged();
                                 break;
