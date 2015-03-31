@@ -8,7 +8,6 @@
     <string name="createNote">Create the note</string>
     <string name="linksNote">Connect</string>
     <string name="addPhoto">Add photo</string>
-    <string name="selectFile">Select file</string>
-    <string name="title_activity_add_photos">AddPhotosActivity</string>
+    <string name="addedPhoto">Added photo</string>
 
 </resources>

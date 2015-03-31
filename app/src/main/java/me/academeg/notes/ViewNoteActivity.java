@@ -2,19 +2,13 @@ package me.academeg.notes;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
-/**
- * Created by Yuriy on 26.02.2015.
- */
+
 
 public class ViewNoteActivity extends ActionBarActivity {
     private final int REQUEST_CODE_LINK_NOTES = 1;
@@ -42,8 +36,8 @@ public class ViewNoteActivity extends ActionBarActivity {
             }
 
             if(requestCode==REQUEST_TAKE_PHOTO) {
-                Log.d("myLog", "Photo gets");
-                
+                Intent intent = new Intent(ViewNoteActivity.this, ViewPhotosActivity.class);
+                startActivity(intent);
             }
         }
     }
@@ -74,17 +68,16 @@ public class ViewNoteActivity extends ActionBarActivity {
         }
 
         if (id == R.id.linkNote) {
-            Log.d("myLog", "Добавляем ссылки");
             Intent intent = new Intent(ViewNoteActivity.this, ViewLinkedNoteActivity.class);
             intent.putExtra("id", noteID);
             startActivity(intent);
             //startActivityForResult(intent, REQUEST_CODE_LINK_NOTES);
         }
 
-        if (id == R.id.addPhoto) {
-            Intent takePictureIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            takePictureIntent.setType("image/*");
-            startActivityForResult(Intent.createChooser(takePictureIntent, getResources().getString(R.string.selectFile)), REQUEST_TAKE_PHOTO);
+        if (id == R.id.addedPhoto) {
+            Intent intent = new Intent(ViewNoteActivity.this, ViewPhotosActivity.class);
+            intent.putExtra("id", noteID);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
