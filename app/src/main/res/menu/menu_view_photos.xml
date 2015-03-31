@@ -3,13 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ViewNoteActivity">
+
     <item
-        android:id="@+id/linkNote"
-        app:showAsAction="always"
-        android:title="@string/linksNote">
-    </item>
-    <item
-        android:id="@+id/addedPhoto"
-        android:title="@string/addedPhoto">
+        android:id="@+id/addPhoto"
+        android:title="@string/addPhoto">
     </item>
 </menu>

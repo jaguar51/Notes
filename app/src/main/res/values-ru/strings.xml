@@ -7,6 +7,6 @@
     <string name="subject">Введите заголовок</string>
     <string name="text">Введите текст заметки</string>
     <string name="addPhoto">Добавить фотографию</string>
-    <string name="selectFile">Выберите файл</string>
+    <string name="addedPhoto">Прикрепленные фото</string>
 
 </resources>
