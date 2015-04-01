@@ -7,14 +7,15 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.format.Time;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 
@@ -22,6 +23,8 @@ public class ViewPhotosActivity extends ActionBarActivity {
     private long noteID;
     static final int GALLERY_REQUEST = 1;
     Uri selectedImage;
+    Bitmap galleryPic;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,15 +38,44 @@ public class ViewPhotosActivity extends ActionBarActivity {
         ((Button)findViewById(R.id.button)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent();
+                /*Intent in = new Intent();
                 in.setAction(Intent.ACTION_VIEW);
                 in.setDataAndType(selectedImage, "image/*");
-                startActivity(in);
-                
+                startActivity(in);*/
+
+                if (!Environment.getExternalStorageState().equals(
+                        Environment.MEDIA_MOUNTED)) {
+                    Log.d("mLog", "SD-карта не доступна: " + Environment.getExternalStorageState());
+                    return;
+                }
+
+                // Create patch for file
+                File sdPath = Environment.getExternalStorageDirectory();
+                sdPath = new File(sdPath.getAbsolutePath() + "/" + ".notes");
+                sdPath.mkdirs();
+
+                //Get time to generate filename
+                Time time = new Time();   time.setToNow();
+                String fileName = Long.toString(time.toMillis(false))+".png";
+
+                //Write photo to file
+                File file = new File(sdPath, fileName);
+                try {
+                    FileOutputStream fos = null;
+                    try {
+                        fos = new FileOutputStream(file);
+                        galleryPic.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                    } finally {
+                        if (fos != null) fos.close();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                Log.d("mLogs", "Запись успешно завершена");
 
             }
         });
-        //myImageView = (ImageView) findViewById(R.id.imageView);
     }
 
 
@@ -53,7 +85,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
         if (resultCode == RESULT_OK) {
             if(requestCode == GALLERY_REQUEST) {
-                Bitmap galleryPic = null;
+                galleryPic = null;
                 selectedImage = imageReturnedIntent.getData();
                 try {
                     galleryPic = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
