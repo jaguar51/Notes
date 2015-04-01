@@ -19,10 +19,9 @@ import java.util.ArrayList;
 
 
 public class ViewPhotosActivity extends ActionBarActivity {
-    private long noteID;
     static final int GALLERY_REQUEST = 1;
+    private long noteID;
     private Uri selectedImage;
-    private Bitmap galleryPic;
     private ArrayList<String> ListImage;
 
     @Override
@@ -56,8 +55,8 @@ public class ViewPhotosActivity extends ActionBarActivity {
             Intent in = new Intent();
             in.setAction(Intent.ACTION_VIEW);
             File sdPath = new File(ListImage.get(position));
-            selectedImage = Uri.fromFile(sdPath);
-            in.setDataAndType(selectedImage, "image/*");
+            Uri selectImage = Uri.fromFile(sdPath);
+            in.setDataAndType(selectImage, "image/*");
             startActivity(in);
         }
     };
@@ -69,7 +68,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
         if (resultCode == RESULT_OK) {
             if(requestCode == GALLERY_REQUEST) {
-                galleryPic = null;
+                Bitmap galleryPic = null;
                 selectedImage = imageReturnedIntent.getData();
                 try {
                     galleryPic = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
