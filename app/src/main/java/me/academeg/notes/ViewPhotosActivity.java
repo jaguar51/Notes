@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,6 +36,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
         Intent intent = getIntent();
         noteID = intent.getLongExtra("id", -1);
 
+        //Test write file
         ((Button)findViewById(R.id.button)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,6 +76,21 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
                 Log.d("mLogs", "Запись успешно завершена");
 
+            }
+        });
+        //Test open file
+        ((Button)findViewById(R.id.button2)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in = new Intent();
+                in.setAction(Intent.ACTION_VIEW);
+
+                File sdPath = new File("/sdcard/.notes/1.png");
+                selectedImage = Uri.fromFile(sdPath);
+                Log.d("mLog", selectedImage.getPath());
+                in.setDataAndType(selectedImage, "image/*");
+                startActivity(in);
+                //((ImageView)findViewById(R.id.imageView)).setImageURI(selectedImage);
             }
         });
     }
