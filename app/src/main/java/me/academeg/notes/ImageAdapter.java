@@ -13,6 +13,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class ImageAdapter extends BaseAdapter {
+    static final private String PATCH_PHOTOS = "/sdcard/.notes/";
+
     private Context mContext;
     private ArrayList<String> mThumbIds;
 
@@ -51,7 +53,7 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        imageView.setImageURI(Uri.fromFile(new File(mThumbIds.get(position))));
+        imageView.setImageURI(Uri.fromFile(new File(PATCH_PHOTOS+mThumbIds.get(position))));
         return imageView;
     }
 }

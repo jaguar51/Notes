@@ -3,9 +3,13 @@ package me.academeg.notes;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.format.Time;
+import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,14 +19,22 @@ import android.widget.GridView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 
 public class ViewPhotosActivity extends ActionBarActivity {
     static final int GALLERY_REQUEST = 1;
+    static final private String PATCH_PHOTOS = "/sdcard/.notes/";
+    static private final String FILE_NAME_PHOTOS = "photos";
+
     private long noteID;
-    private Uri selectedImage;
-    private ArrayList<String> ListImage;
+    private ArrayList<String> thisPhotoId = new ArrayList<String>();
+    private ArrayList<Pair<Long, String>> otherPhotoId = new ArrayList<Pair<Long, String>>(); // пары связей
+
+    private ImageAdapter imageAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,17 +45,17 @@ public class ViewPhotosActivity extends ActionBarActivity {
         Intent intent = getIntent();
         noteID = intent.getLongExtra("id", -1);
 
-        ListImage = new ArrayList<String>();
 
-        ListImage.add("/sdcard/.notes/1.png");
-        ListImage.add("/sdcard/.notes/2.png");
+        /*thisPhotoId.add("1");
+        thisPhotoId.add("2");*/
 
+        readPhotosFromFile();
 
-
-        GridView gridView = (GridView) findViewById(R.id.gridView1);
-        gridView.setAdapter(new ImageAdapter(this, ListImage));
-        gridView.setOnItemClickListener(gridviewOnItemClickListener);
-        //((GridView) findViewById(R.id.gridView1)).setAdapter(new ImageAdapter(this, ListImage));
+        //Find photoList and set adapter
+        GridView photoGridView = (GridView) findViewById(R.id.photoGridView);
+        imageAdapter = new ImageAdapter(this, thisPhotoId);
+        photoGridView.setAdapter(imageAdapter);
+        photoGridView.setOnItemClickListener(gridviewOnItemClickListener);
     }
 
     private GridView.OnItemClickListener gridviewOnItemClickListener = new GridView.OnItemClickListener() {
@@ -54,7 +66,8 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
             Intent in = new Intent();
             in.setAction(Intent.ACTION_VIEW);
-            File sdPath = new File(ListImage.get(position));
+            String pathString = "/sdcard/.notes/"+thisPhotoId.get(position);
+            File sdPath = new File(PATCH_PHOTOS + thisPhotoId.get(position));
             Uri selectImage = Uri.fromFile(sdPath);
             in.setDataAndType(selectImage, "image/*");
             startActivity(in);
@@ -69,13 +82,18 @@ public class ViewPhotosActivity extends ActionBarActivity {
         if (resultCode == RESULT_OK) {
             if(requestCode == GALLERY_REQUEST) {
                 Bitmap galleryPic = null;
-                selectedImage = imageReturnedIntent.getData();
+                Uri selectedImage = imageReturnedIntent.getData();
                 try {
                     galleryPic = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
                 }
                 catch (IOException e) {
                     e.printStackTrace();
                 }
+                String fileName = generateFileName();
+                writePhotoToCahce(fileName, galleryPic);
+                thisPhotoId.add(fileName);
+                writePhotosToFile();
+                imageAdapter.notifyDataSetChanged();
                 //myImageView.setImageBitmap(galleryPic);
             }
         }
@@ -113,6 +131,83 @@ public class ViewPhotosActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private String generateFileName() {
+        Time time = new Time();
+        time.setToNow();
+        //return Long.toString(time.toMillis(false))+".png";
+        return Long.toString(time.toMillis(false));
+    }
+
+
+    public void writePhotosToFile() {
+        try {
+            PrintWriter outputLink = new PrintWriter(openFileOutput(
+                    FILE_NAME_PHOTOS, MODE_PRIVATE));
+
+            for (int i = 0; i < otherPhotoId.size(); i++) {
+                outputLink.print(otherPhotoId.get(i).first);
+                outputLink.print(" ");
+                outputLink.println(otherPhotoId.get(i).second);
+            }
+
+            for (int i = 0; i < thisPhotoId.size(); i++) {
+                outputLink.print(noteID);
+                outputLink.print(" ");
+                outputLink.println(thisPhotoId.get(i));
+            }
+
+            outputLink.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void readPhotosFromFile() {
+        try {
+            thisPhotoId.clear();
+            otherPhotoId.clear();
+
+            Scanner inputPhotos = new Scanner(openFileInput(FILE_NAME_PHOTOS));
+            while (inputPhotos.hasNext()) {
+                long idNote = inputPhotos.nextLong();
+                long idPhoto = inputPhotos.nextLong();
+                Log.d("testRead", String.valueOf(idNote) + " " + String.valueOf(idPhoto));
+                if(idNote == noteID) {
+                    thisPhotoId.add(String.valueOf(idPhoto));
+                    continue;
+                }
+                otherPhotoId.add(Pair.create(idNote, String.valueOf(idPhoto)));
+            }
+            inputPhotos.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writePhotoToCahce(String fileName, Bitmap galleryPic) {
+        // Create patch for file
+        File sdPath = Environment.getExternalStorageDirectory();
+        sdPath = new File(sdPath.getAbsolutePath() + "/" + ".notes");
+        sdPath.mkdirs();
+
+        File file = new File(sdPath, fileName);
+        try {
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(file);
+                galleryPic.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            } finally {
+                if (fos != null) fos.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //Log.d("mLogs", "Запись успешно завершена");
     }
 
 }
