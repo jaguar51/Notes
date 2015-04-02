@@ -5,6 +5,7 @@
     <string name="text">Write the note</string>
     <string name="subject">Note title</string>
     <string name="deleteNote">Delete the note</string>
+    <string name="delete">Delete</string>
     <string name="createNote">Create the note</string>
     <string name="linksNote">Connect</string>
     <string name="addPhoto">Add photo</string>

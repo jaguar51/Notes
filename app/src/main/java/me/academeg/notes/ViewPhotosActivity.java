@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.format.Time;
 import android.util.Log;
 import android.util.Pair;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,8 +27,11 @@ import java.util.Scanner;
 
 public class ViewPhotosActivity extends ActionBarActivity {
     static final int GALLERY_REQUEST = 1;
+
     static final private String PATCH_PHOTOS = "/sdcard/.notes/";
     static private final String FILE_NAME_PHOTOS = "photos";
+
+    private final int CM_DELET = 1;
 
     private long noteID;
     private ArrayList<String> thisPhotoId = new ArrayList<String>();
@@ -45,16 +49,13 @@ public class ViewPhotosActivity extends ActionBarActivity {
         Intent intent = getIntent();
         noteID = intent.getLongExtra("id", -1);
 
-
-        /*thisPhotoId.add("1");
-        thisPhotoId.add("2");*/
-
         readPhotosFromFile();
 
         //Find photoList and set adapter
         GridView photoGridView = (GridView) findViewById(R.id.photoGridView);
         imageAdapter = new ImageAdapter(this, thisPhotoId);
         photoGridView.setAdapter(imageAdapter);
+        registerForContextMenu(photoGridView);
         photoGridView.setOnItemClickListener(gridviewOnItemClickListener);
     }
 
@@ -94,7 +95,6 @@ public class ViewPhotosActivity extends ActionBarActivity {
                 thisPhotoId.add(fileName);
                 writePhotosToFile();
                 imageAdapter.notifyDataSetChanged();
-                //myImageView.setImageBitmap(galleryPic);
             }
         }
 
@@ -133,10 +133,34 @@ public class ViewPhotosActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add(0, CM_DELET, 0, R.string.delete);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getItemId() == CM_DELET) {
+            AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            //removeLinksFromFile(notes.get(acmi.position).getId());
+
+            File deletePhotoFile = new File(PATCH_PHOTOS + thisPhotoId.get(acmi.position));
+            deletePhotoFile.delete();
+            thisPhotoId.remove(acmi.position);
+            writePhotosToFile();
+            imageAdapter.notifyDataSetChanged();
+            return true;
+        }
+
+        return super.onContextItemSelected(item);
+    }
+
+    //Generate name for photo, how time
     private String generateFileName() {
         Time time = new Time();
         time.setToNow();
-        //return Long.toString(time.toMillis(false))+".png";
         return Long.toString(time.toMillis(false));
     }
 

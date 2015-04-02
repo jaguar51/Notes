@@ -8,5 +8,6 @@
     <string name="text">Введите текст заметки</string>
     <string name="addPhoto">Добавить фотографию</string>
     <string name="addedPhoto">Прикрепленные фото</string>
+    <string name="delete">Удалить</string>
 
 </resources>
