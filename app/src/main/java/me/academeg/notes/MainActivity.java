@@ -21,6 +21,8 @@ import org.xml.sax.InputSource;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -43,7 +45,9 @@ public class MainActivity extends ActionBarActivity {
 
     private final int CM_DELET = 1;
 
-    private final String FILE_NAME = "notes";
+    static private final String FILE_NAME = "notes";
+    //static private final String FILE_NAME_LINKS = "links";
+    static private final String FILE_NAME_PHOTOS = "photos";
 
     private Note tmpNote;
 
@@ -158,6 +162,7 @@ public class MainActivity extends ActionBarActivity {
         if (item.getItemId() == CM_DELET) {
             AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             removeLinksFromFile(notes.get(acmi.position).getId());
+            removePhotosFromFile(notes.get(acmi.position).getId());
             notes.remove(acmi.position);
             writeNotesToFile();
             notesAdapter.notifyDataSetChanged();
@@ -193,6 +198,40 @@ public class MainActivity extends ActionBarActivity {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void removePhotosFromFile(long noteID) {
+        ArrayList<Pair<Long, String>> photoId = new ArrayList<Pair<Long, String>>();
+
+        try {
+            Scanner inputPhotos = new Scanner(openFileInput(FILE_NAME_PHOTOS));
+            while (inputPhotos.hasNext()) {
+                long idNote = inputPhotos.nextLong();
+                long idPhoto = inputPhotos.nextLong();
+                //Log.d("testRead", String.valueOf(idNote) + " " + String.valueOf(idPhoto));
+                if(idNote == noteID) {
+                    File deletePhotoFile = new File("/sdcard/.notes/" + idPhoto);
+                    deletePhotoFile.delete();
+                    continue;
+                }
+                photoId.add(Pair.create(idNote, String.valueOf(idPhoto)));
+            }
+            inputPhotos.close();
+
+            PrintWriter outputLink = new PrintWriter(openFileOutput(
+                    FILE_NAME_PHOTOS, MODE_PRIVATE));
+
+            for (int i = 0; i < photoId.size(); i++) {
+                outputLink.print(photoId.get(i).first);
+                outputLink.print(" ");
+                outputLink.println(photoId.get(i).second);
+            }
+            outputLink.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void writeNotesToFile() {

@@ -164,7 +164,6 @@ public class ViewPhotosActivity extends ActionBarActivity {
         return Long.toString(time.toMillis(false));
     }
 
-
     public void writePhotosToFile() {
         try {
             PrintWriter outputLink = new PrintWriter(openFileOutput(
@@ -198,7 +197,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
             while (inputPhotos.hasNext()) {
                 long idNote = inputPhotos.nextLong();
                 long idPhoto = inputPhotos.nextLong();
-                Log.d("testRead", String.valueOf(idNote) + " " + String.valueOf(idPhoto));
+                //Log.d("testRead", String.valueOf(idNote) + " " + String.valueOf(idPhoto));
                 if(idNote == noteID) {
                     thisPhotoId.add(String.valueOf(idPhoto));
                     continue;
