@@ -67,7 +67,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
             Intent in = new Intent();
             in.setAction(Intent.ACTION_VIEW);
-            String pathString = "/sdcard/.notes/"+thisPhotoId.get(position);
+            //String pathString = "/sdcard/.notes/"+thisPhotoId.get(position);
             File sdPath = new File(PATCH_PHOTOS + thisPhotoId.get(position));
             Uri selectImage = Uri.fromFile(sdPath);
             in.setDataAndType(selectImage, "image/*");
