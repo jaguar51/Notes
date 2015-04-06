@@ -48,12 +48,11 @@ public class ImageAdapter extends BaseAdapter {
             imageView.setLayoutParams(new GridView.LayoutParams(400, 400));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(8, 8, 8, 8);
-            //imageView.setMinimumHeight(150);
         } else {
             imageView = (ImageView) convertView;
         }
 
-        imageView.setImageURI(Uri.fromFile(new File(PATCH_PHOTOS+mThumbIds.get(position))));
+        imageView.setImageURI(Uri.fromFile(new File(PATCH_PHOTOS + mThumbIds.get(position))));
         return imageView;
     }
 }

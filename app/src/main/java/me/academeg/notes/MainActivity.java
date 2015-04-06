@@ -74,7 +74,6 @@ public class MainActivity extends ActionBarActivity {
                 startActivityForResult(intent, REQUEST_CODE_EDIT_NOTE);
             }
         });
-
     }
 
     @Override
@@ -86,12 +85,12 @@ public class MainActivity extends ActionBarActivity {
                     tmpNote.setSubject(data.getStringExtra("subject"));
                     for (int i = 0; i < notes.size(); i++) {
                         if(notes.get(i).getId() == tmpNote.getId()) {
-                            if (tmpNote.getText().isEmpty() && tmpNote.getSubject().isEmpty()) {
+                            /*if (tmpNote.getText().isEmpty() && tmpNote.getSubject().isEmpty()) {
                                 //removeLinksFromFile(notes.get(i).getId());
                                 notes.remove(i);
                                 notesAdapter.notifyDataSetChanged();
                                 break;
-                            }
+                            }*/
                             notes.get(i).setSubject(tmpNote.getSubject());
                             notes.get(i).setText(tmpNote.getText());
                             break;
@@ -102,14 +101,14 @@ public class MainActivity extends ActionBarActivity {
                     break;
 
                 case REQUEST_CODE_CREATE_NOTE:
-                    tmpNote.setSubject(data.getStringExtra("subject"));
-                    tmpNote.setText(data.getStringExtra("text"));
-                    if (!tmpNote.getText().isEmpty() || !tmpNote.getSubject().isEmpty()) {
-                        notes.add(tmpNote);
-                        writeNotesToFile();
-                        notesAdapter.notifyDataSetChanged();
-                    }
-                    break;
+                tmpNote.setSubject(data.getStringExtra("subject"));
+                tmpNote.setText(data.getStringExtra("text"));
+                if (!tmpNote.getText().isEmpty() || !tmpNote.getSubject().isEmpty()) {
+                    notes.add(tmpNote);
+                    writeNotesToFile();
+                    notesAdapter.notifyDataSetChanged();
+                }
+                break;
             }
         }
     }

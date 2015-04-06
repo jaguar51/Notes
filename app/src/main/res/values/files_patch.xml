@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--File Names-->
+    <string name="notesFileName">notes</string>
+    <string name="photosFileName">photos</string>
+    <string name="linksFileName">links</string>
+
+    <!--Patch-->
+    <string name="patchPhotos">/sdcard/.notes/</string>
+
+</resources>
