@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class ImageAdapter extends BaseAdapter {
-    static final private String PATCH_PHOTOS = "/sdcard/.notes/";
+    private static final String PATCH_PHOTOS = "/sdcard/.notes/";
 
     private Context mContext;
     private ArrayList<String> mThumbIds;

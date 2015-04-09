@@ -30,8 +30,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 
 public class ViewLinkedNoteActivity extends ActionBarActivity {
-    private final String FILE_NAME = "notes";
-    private final String FILE_NAME_LINKS = "links";
+    private static final String FILE_NAME = "notes";
+    private static final String FILE_NAME_LINKS = "links";
 
     private long noteID;
     private ArrayList<Note> notes = new ArrayList<Note>();

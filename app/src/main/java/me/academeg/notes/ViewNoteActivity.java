@@ -3,7 +3,6 @@ package me.academeg.notes;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -11,7 +10,7 @@ import android.widget.EditText;
 
 
 public class ViewNoteActivity extends ActionBarActivity {
-    private final int REQUEST_CODE_LINK_NOTES = 1;
+    //private static final int REQUEST_CODE_LINK_NOTES = 1;
     private static final int REQUEST_TAKE_PHOTO = 2;
     private long noteID;
 
@@ -31,9 +30,7 @@ public class ViewNoteActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_CODE_LINK_NOTES) {
-
-            }
+            /*if (requestCode == REQUEST_CODE_LINK_NOTES) { }*/
 
             if(requestCode==REQUEST_TAKE_PHOTO) {
                 Intent intent = new Intent(ViewNoteActivity.this, ViewPhotosActivity.class);

@@ -7,8 +7,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.text.format.Time;
-import android.util.Log;
 import android.util.Pair;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -21,17 +19,20 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Scanner;
 
 
 public class ViewPhotosActivity extends ActionBarActivity {
-    static final int GALLERY_REQUEST = 1;
+    private static final int GALLERY_REQUEST = 1;
 
-    static final private String PATCH_PHOTOS = "/sdcard/.notes/";
-    static private final String FILE_NAME_PHOTOS = "photos";
+    //static final private String PATCH_PHOTOS = "/sdcard/.notes/";
+    private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";
+    private static final String FILE_NAME_PHOTOS = "photos";
 
-    private final int CM_DELET = 1;
+    private static final int CM_DELET = 1;
 
     private long noteID;
     private ArrayList<String> thisPhotoId = new ArrayList<String>();
@@ -159,9 +160,10 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
     //Generate name for photo, how time
     private String generateFileName() {
-        Time time = new Time();
-        time.setToNow();
-        return Long.toString(time.toMillis(false));
+        Date dNow = new Date( );
+        SimpleDateFormat ft =
+                new SimpleDateFormat ("yyyyMMdd_HHmmss");
+        return ft.format(dNow);
     }
 
     public void writePhotosToFile() {
@@ -196,13 +198,15 @@ public class ViewPhotosActivity extends ActionBarActivity {
             Scanner inputPhotos = new Scanner(openFileInput(FILE_NAME_PHOTOS));
             while (inputPhotos.hasNext()) {
                 long idNote = inputPhotos.nextLong();
-                long idPhoto = inputPhotos.nextLong();
+                String idPhoto = inputPhotos.nextLine();
+                idPhoto = idPhoto.trim();
+
                 //Log.d("testRead", String.valueOf(idNote) + " " + String.valueOf(idPhoto));
                 if(idNote == noteID) {
-                    thisPhotoId.add(String.valueOf(idPhoto));
+                    thisPhotoId.add(idPhoto);
                     continue;
                 }
-                otherPhotoId.add(Pair.create(idNote, String.valueOf(idPhoto)));
+                otherPhotoId.add(Pair.create(idNote, idPhoto));
             }
             inputPhotos.close();
         }
@@ -214,7 +218,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
     private void writePhotoToCahce(String fileName, Bitmap galleryPic) {
         // Create patch for file
         File sdPath = Environment.getExternalStorageDirectory();
-        sdPath = new File(sdPath.getAbsolutePath() + "/" + ".notes");
+        sdPath = new File(sdPath.getAbsolutePath() + "/.notes");
         sdPath.mkdirs();
 
         File file = new File(sdPath, fileName);
@@ -229,7 +233,6 @@ public class ViewPhotosActivity extends ActionBarActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         //Log.d("mLogs", "Запись успешно завершена");
     }
 

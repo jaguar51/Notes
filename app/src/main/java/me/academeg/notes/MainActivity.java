@@ -1,6 +1,7 @@
 package me.academeg.notes;
 
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,10 +41,10 @@ public class MainActivity extends ActionBarActivity {
     private ArrayList<Note> notes = new ArrayList<Note>();
     private NotesAdapter notesAdapter;
 
-    private final int REQUEST_CODE_EDIT_NOTE = 1;
-    private final int REQUEST_CODE_CREATE_NOTE = 2;
+    private static final int REQUEST_CODE_EDIT_NOTE = 1;
+    private static final int REQUEST_CODE_CREATE_NOTE = 2;
 
-    private final int CM_DELET = 1;
+    private static final int CM_DELET = 1;
 
     static private final String FILE_NAME = "notes";
     //static private final String FILE_NAME_LINKS = "links";
@@ -206,14 +207,15 @@ public class MainActivity extends ActionBarActivity {
             Scanner inputPhotos = new Scanner(openFileInput(FILE_NAME_PHOTOS));
             while (inputPhotos.hasNext()) {
                 long idNote = inputPhotos.nextLong();
-                long idPhoto = inputPhotos.nextLong();
+                String idPhoto = inputPhotos.nextLine();
+                idPhoto = idPhoto.trim();
                 //Log.d("testRead", String.valueOf(idNote) + " " + String.valueOf(idPhoto));
                 if(idNote == noteID) {
-                    File deletePhotoFile = new File("/sdcard/.notes/" + idPhoto);
+                    File deletePhotoFile = new File(Environment.getExternalStorageDirectory().getPath() + "/.notes/" + idPhoto);
                     deletePhotoFile.delete();
                     continue;
                 }
-                photoId.add(Pair.create(idNote, String.valueOf(idPhoto)));
+                photoId.add(Pair.create(idNote, idPhoto));
             }
             inputPhotos.close();
 
