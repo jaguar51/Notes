@@ -5,7 +5,7 @@
 <p>
 <ol>
 	<li>Fix bug with load photo</li>
-	<li>Fix bug with return to main screen</li>
+	<li>Fix bug with crash app on return to main screen</li>
 </ol>
 </p>
 
