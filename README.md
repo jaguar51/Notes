@@ -1,6 +1,21 @@
 <h1>Notes</h1>
 Заметки с возможностью их связи друг с другом.
 
+<h3>V 1.3.2</h3>
+<p>
+<ol>
+	<li>Fix bug with load photo</li>
+	<li>Fix bug with return to main screen</li>
+</ol>
+</p>
+
+<h3>V 1.3.1</h3>
+<p>
+<ol>
+	<li>Support API22</li>
+</ol>
+</p>
+
 <h3>V 1.3.0</h3>
 <p>
 <ol>
