@@ -28,11 +28,10 @@ import java.util.Scanner;
 public class ViewPhotosActivity extends ActionBarActivity {
     private static final int GALLERY_REQUEST = 1;
 
-    //static final private String PATCH_PHOTOS = "/sdcard/.notes/";
     private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";
     private static final String FILE_NAME_PHOTOS = "photos";
 
-    private static final int CM_DELET = 1;
+    private static final int CM_DELETE = 1;
 
     private long noteID;
     private ArrayList<String> thisPhotoId = new ArrayList<String>();
@@ -49,7 +48,6 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
         noteID = intent.getLongExtra("id", -1);
-
         readPhotosFromFile();
 
         //Find photoList and set adapter
@@ -68,7 +66,6 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
             Intent in = new Intent();
             in.setAction(Intent.ACTION_VIEW);
-            //String pathString = "/sdcard/.notes/"+thisPhotoId.get(position);
             File sdPath = new File(PATCH_PHOTOS + thisPhotoId.get(position));
             Uri selectImage = Uri.fromFile(sdPath);
             in.setDataAndType(selectImage, "image/*");
@@ -86,13 +83,14 @@ public class ViewPhotosActivity extends ActionBarActivity {
                 Bitmap galleryPic = null;
                 Uri selectedImage = imageReturnedIntent.getData();
                 try {
-                    galleryPic = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+                    galleryPic = MediaStore.Images.Media.getBitmap(
+                            getContentResolver(), selectedImage);
                 }
                 catch (IOException e) {
                     e.printStackTrace();
                 }
                 String fileName = generateFileName();
-                writePhotoToCahce(fileName, galleryPic);
+                writePhotoToCache(fileName, galleryPic);
                 thisPhotoId.add(fileName);
                 writePhotosToFile();
                 imageAdapter.notifyDataSetChanged();
@@ -138,12 +136,12 @@ public class ViewPhotosActivity extends ActionBarActivity {
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, CM_DELET, 0, R.string.delete);
+        menu.add(0, CM_DELETE, 0, R.string.delete);
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if (item.getItemId() == CM_DELET) {
+        if (item.getItemId() == CM_DELETE) {
             AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             //removeLinksFromFile(notes.get(acmi.position).getId());
 
@@ -215,7 +213,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
         }
     }
 
-    private void writePhotoToCahce(String fileName, Bitmap galleryPic) {
+    private void writePhotoToCache(String fileName, Bitmap galleryPic) {
         // Create patch for file
         File sdPath = Environment.getExternalStorageDirectory();
         sdPath = new File(sdPath.getAbsolutePath() + "/.notes");
@@ -237,3 +235,4 @@ public class ViewPhotosActivity extends ActionBarActivity {
     }
 
 }
+

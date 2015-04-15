@@ -40,17 +40,16 @@ public class NotesAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view = convertView;
-        if (view == null) {
-            view = lInflater.inflate(R.layout.item_note_list, parent, false);
+        if (convertView == null) {
+            convertView = lInflater.inflate(R.layout.item_note_list, parent, false);
         }
 
         Note note = getItem(position);
 
-        ((TextView)view.findViewById(R.id.subjectTv)).setText(cutText(note.getSubject()));
-        ((TextView)view.findViewById(R.id.textTv)).setText(cutText(note.getText()));
+        ((TextView)convertView.findViewById(R.id.subjectTv)).setText(cutText(note.getSubject()));
+        ((TextView)convertView.findViewById(R.id.textTv)).setText(cutText(note.getText()));
 
-        return view;
+        return convertView;
     }
 
     protected String cutText(String txt) {

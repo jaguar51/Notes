@@ -23,7 +23,6 @@ import org.xml.sax.InputSource;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -170,6 +169,20 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onContextItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (tmpNote != null) {
+            outState.putLong("tmpNoteId", tmpNote.getId());
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        tmpNote = new Note(savedInstanceState.getLong("tmpNoteId"));
     }
 
     public void removeLinksFromFile(long noteID) {

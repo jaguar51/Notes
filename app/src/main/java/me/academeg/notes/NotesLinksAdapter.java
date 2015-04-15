@@ -24,17 +24,16 @@ public class NotesLinksAdapter extends NotesAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view = convertView;
-
-        if (view == null) {
-            view = lInflater.inflate(R.layout.item_note_list_check, parent, false);
+        if (convertView == null) {
+            convertView = lInflater.inflate(R.layout.item_note_list_check, parent, false);
         }
 
         Note note = getItem(position);
 
-        ((TextView)view.findViewById(R.id.subjectTv)).setText(cutText(note.getSubject()));
-        ((TextView)view.findViewById(R.id.textTv)).setText(cutText(note.getText()));
-        CheckBox cbBox = ((CheckBox)view.findViewById(R.id.cbBox));
+        ((TextView)convertView.findViewById(R.id.subjectTv)).setText(cutText(note.getSubject()));
+        ((TextView)convertView.findViewById(R.id.textTv)).setText(cutText(note.getText()));
+
+        CheckBox cbBox = ((CheckBox)convertView.findViewById(R.id.cbBox));
         for(int i = 0; i < links.size(); i++) {
             if(note.getId() == links.get(i))
                 cbBox.setChecked(true);
@@ -42,7 +41,7 @@ public class NotesLinksAdapter extends NotesAdapter {
 
         cbBox.setOnCheckedChangeListener(myCheckChangList);
         cbBox.setTag(position);
-        return view;
+        return convertView;
     }
 
     OnCheckedChangeListener myCheckChangList = new OnCheckedChangeListener() {
