@@ -1,8 +1,6 @@
 package me.academeg.notes;
 
-/**
- * Created by Yuriy on 26.02.2015.
- */
+
 public class Note {
     private String subject;
     private String text;

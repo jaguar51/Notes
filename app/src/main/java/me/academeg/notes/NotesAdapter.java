@@ -9,9 +9,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/**
- * Created by TM on 26.02.2015.
- */
+
 public class NotesAdapter extends BaseAdapter {
     private Context ctx;
     protected LayoutInflater lInflater;

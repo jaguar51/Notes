@@ -8,7 +8,6 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 
-
 public class ViewNoteActivity extends ActionBarActivity {
     //private static final int REQUEST_CODE_LINK_NOTES = 1;
     private static final int REQUEST_TAKE_PHOTO = 2;
@@ -79,6 +78,5 @@ public class ViewNoteActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
 
 }
