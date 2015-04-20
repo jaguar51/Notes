@@ -94,6 +94,8 @@ public class ViewPhotosActivity extends ActionBarActivity {
                 thisPhotoId.add(fileName);
                 writePhotosToFile();
                 imageAdapter.notifyDataSetChanged();
+
+                return;
             }
         }
 
@@ -142,7 +144,8 @@ public class ViewPhotosActivity extends ActionBarActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getItemId() == CM_DELETE) {
-            AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            AdapterView.AdapterContextMenuInfo acmi =
+                    (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             //removeLinksFromFile(notes.get(acmi.position).getId());
 
             File deletePhotoFile = new File(PATCH_PHOTOS + thisPhotoId.get(acmi.position));

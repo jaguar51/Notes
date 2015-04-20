@@ -15,15 +15,10 @@ import java.util.ArrayList;
 
 
 public class ImageAdapter extends BaseAdapter {
-    private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";;
+    private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";
 
     private Context mContext;
     private ArrayList<String> mThumbIds;
-
-    public ImageAdapter(Context c) {
-        mContext = c;
-        mThumbIds = new ArrayList<String>();
-    }
 
     public ImageAdapter(Context c, ArrayList<String> arrayList) {
         mContext = c;
@@ -70,7 +65,7 @@ public class ImageAdapter extends BaseAdapter {
             ((ImageView) convertView).setImageBitmap(null);
         }
 
-        // Async load image to imageview
+        // Async load image to imageView
         new AsyncTask<ViewHolder, Void, Bitmap>() {
             private ViewHolder view;
 

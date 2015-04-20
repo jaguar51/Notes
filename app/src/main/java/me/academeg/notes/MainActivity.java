@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.melnykov.fab.FloatingActionButton;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -46,7 +48,7 @@ public class MainActivity extends ActionBarActivity {
     private static final int CM_DELETE = 1;
 
     static private final String FILE_NAME = "notes";
-    //static private final String FILE_NAME_LINKS = "links";
+    static private final String FILE_NAME_LINKS = "links";
     static private final String FILE_NAME_PHOTOS = "photos";
 
     private Note tmpNote;
@@ -74,33 +76,51 @@ public class MainActivity extends ActionBarActivity {
                 startActivityForResult(intent, REQUEST_CODE_EDIT_NOTE);
             }
         });
+
+        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.createNoteButton);
+        floatingActionButton.attachToListView(notesList);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                long maxId = 0;
+                for (int i = 0; i < notes.size(); i++)
+                    if (notes.get(i).getId() > maxId)
+                        maxId = notes.get(i).getId();
+                maxId += 1;
+                //Log.d("myLog", String.valueOf(maxId));
+                tmpNote = new Note(maxId);
+                Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
+                intent.putExtra("id", tmpNote.getId());
+                startActivityForResult(intent, REQUEST_CODE_CREATE_NOTE);
+            }
+        });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case REQUEST_CODE_EDIT_NOTE:
-                    tmpNote.setText(data.getStringExtra("text"));
-                    tmpNote.setSubject(data.getStringExtra("subject"));
-                    for (int i = 0; i < notes.size(); i++) {
-                        if(notes.get(i).getId() == tmpNote.getId()) {
+            if(requestCode == REQUEST_CODE_EDIT_NOTE) {
+                tmpNote.setText(data.getStringExtra("text"));
+                tmpNote.setSubject(data.getStringExtra("subject"));
+                for (int i = 0; i < notes.size(); i++) {
+                    if(notes.get(i).getId() == tmpNote.getId()) {
                             /*if (tmpNote.getText().isEmpty() && tmpNote.getSubject().isEmpty()) {
                                 //removeLinksFromFile(notes.get(i).getId());
                                 notes.remove(i);
                                 notesAdapter.notifyDataSetChanged();
                                 break;
                             }*/
-                            notes.get(i).setSubject(tmpNote.getSubject());
-                            notes.get(i).setText(tmpNote.getText());
-                            break;
-                        }
+                        notes.get(i).setSubject(tmpNote.getSubject());
+                        notes.get(i).setText(tmpNote.getText());
+                        break;
                     }
-                    writeNotesToFile();
-                    notesAdapter.notifyDataSetChanged();
-                    break;
+                }
+                writeNotesToFile();
+                notesAdapter.notifyDataSetChanged();
+                return;
+            }
 
-                case REQUEST_CODE_CREATE_NOTE:
+            if(requestCode == REQUEST_CODE_CREATE_NOTE) {
                 tmpNote.setSubject(data.getStringExtra("subject"));
                 tmpNote.setText(data.getStringExtra("text"));
                 if (!tmpNote.getText().isEmpty() || !tmpNote.getSubject().isEmpty()) {
@@ -108,7 +128,7 @@ public class MainActivity extends ActionBarActivity {
                     writeNotesToFile();
                     notesAdapter.notifyDataSetChanged();
                 }
-                break;
+                return;
             }
         }
     }
@@ -128,23 +148,9 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        /*if (id == R.id.action_settings) {
             return true;
-        }
-
-        if (id == R.id.createNote) {
-            long maxId = 0;
-            for (int i = 0; i < notes.size(); i++)
-                if (notes.get(i).getId() > maxId)
-                    maxId = notes.get(i).getId();
-            maxId += 1;
-            //Log.d("myLog", String.valueOf(maxId));
-            tmpNote = new Note(maxId);
-            Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
-            intent.putExtra("id", tmpNote.getId());
-            startActivityForResult(intent, REQUEST_CODE_CREATE_NOTE);
-            return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
@@ -190,7 +196,7 @@ public class MainActivity extends ActionBarActivity {
 
         try {
             linkNote.clear();
-            Scanner inputLink = new Scanner(openFileInput("links"));
+            Scanner inputLink = new Scanner(openFileInput(FILE_NAME_LINKS));
             while (inputLink.hasNext()) {
                 long first = inputLink.nextLong();
                 long second = inputLink.nextLong();
@@ -200,7 +206,7 @@ public class MainActivity extends ActionBarActivity {
             inputLink.close();
 
             PrintWriter outputLink = new PrintWriter(openFileOutput(
-                    "links", MODE_PRIVATE));
+                    FILE_NAME_LINKS, MODE_PRIVATE));
             for (int i = 0; i < linkNote.size(); i++) {
                 outputLink.print(linkNote.get(i).first);
                 outputLink.print(" ");

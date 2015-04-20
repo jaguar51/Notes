@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:weightSum="1">
 
@@ -12,5 +13,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/notesListView"
-        android:layout_gravity="center_horizontal" />
-</LinearLayout>
+        android:layout_gravity="center_horizontal"
+        android:headerDividersEnabled="false"/>
+
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/createNoteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="16dp"
+        android:src="@mipmap/ic_plus_white"
+        fab:fab_colorNormal="@color/floatingButtonColor"
+        fab:fab_colorPressed="@color/floatingButtonPressedColor"
+        fab:fab_colorRipple="@color/floatingButtonPressedColor" />
+</FrameLayout>

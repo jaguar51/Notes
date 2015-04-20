@@ -29,7 +29,6 @@ public class ViewNoteActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK) {
-            /*if (requestCode == REQUEST_CODE_LINK_NOTES) { }*/
 
             if(requestCode==REQUEST_TAKE_PHOTO) {
                 Intent intent = new Intent(ViewNoteActivity.this, ViewPhotosActivity.class);
@@ -67,7 +66,6 @@ public class ViewNoteActivity extends ActionBarActivity {
             Intent intent = new Intent(ViewNoteActivity.this, ViewLinkedNoteActivity.class);
             intent.putExtra("id", noteID);
             startActivity(intent);
-            //startActivityForResult(intent, REQUEST_CODE_LINK_NOTES);
         }
 
         if (id == R.id.addedPhoto) {

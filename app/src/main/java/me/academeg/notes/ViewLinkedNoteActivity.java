@@ -48,7 +48,7 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
         noteID = intent.getLongExtra("id", -1);
-        Log.d("checkID", String.valueOf(noteID));
+//        Log.d("checkID", String.valueOf(noteID));
 
         readNotesFromFile();
         readLinksFromFile();
@@ -186,4 +186,5 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
             e.printStackTrace();
         }
     }
+
 }
