@@ -1,11 +1,10 @@
 package me.academeg.notes;
 
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.view.LayoutInflater;
+import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -14,8 +13,9 @@ import android.widget.ImageView;
 
 import java.util.ArrayList;
 
+
 public class ImageAdapter extends BaseAdapter {
-    private static final String PATCH_PHOTOS = "/sdcard/.notes/";
+    private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";;
 
     private Context mContext;
     private ArrayList<String> mThumbIds;
