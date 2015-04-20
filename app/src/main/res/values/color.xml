@@ -2,5 +2,6 @@
 <resources>
     <item name="mainAppColor" type="color">#ff4e6cf0</item>
     <item name="mainAppColorDark" type="color">#ff435fdd</item>
-    <!--<item name="pinkColor" type="color">#ffe91c61</item>-->
+    <item name="floatingButtonColor" type="color">#ffe91c61</item>
+    <item name="floatingButtonPressedColor" type="color">#ffa71c53</item>
 </resources>
