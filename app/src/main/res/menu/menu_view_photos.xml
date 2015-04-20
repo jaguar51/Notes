@@ -6,6 +6,8 @@
 
     <item
         android:id="@+id/addPhoto"
-        android:title="@string/addPhoto">
+        android:icon="@mipmap/ic_plus_white"
+        android:title="@string/addPhoto"
+        app:showAsAction="ifRoom">
     </item>
 </menu>

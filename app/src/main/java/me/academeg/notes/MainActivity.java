@@ -43,7 +43,7 @@ public class MainActivity extends ActionBarActivity {
     private static final int REQUEST_CODE_EDIT_NOTE = 1;
     private static final int REQUEST_CODE_CREATE_NOTE = 2;
 
-    private static final int CM_DELET = 1;
+    private static final int CM_DELETE = 1;
 
     static private final String FILE_NAME = "notes";
     //static private final String FILE_NAME_LINKS = "links";
@@ -153,12 +153,12 @@ public class MainActivity extends ActionBarActivity {
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, CM_DELET, 0, R.string.deleteNote);
+        menu.add(0, CM_DELETE, 0, R.string.deleteNote);
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if (item.getItemId() == CM_DELET) {
+        if (item.getItemId() == CM_DELETE) {
             AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             removeLinksFromFile(notes.get(acmi.position).getId());
             removePhotosFromFile(notes.get(acmi.position).getId());

@@ -6,8 +6,8 @@
     <string name="linksNote">Связать</string>
     <string name="subject">Введите заголовок</string>
     <string name="text">Введите текст заметки</string>
-    <string name="addPhoto">Добавить фотографию</string>
-    <string name="addedPhoto">Прикрепленные фото</string>
+    <string name="addPhoto">Добавить картинку</string>
+    <string name="addedPhoto">Прикрепленные картинки</string>
     <string name="delete">Удалить</string>
 
 </resources>
