@@ -5,11 +5,14 @@
     tools:context=".ViewNoteActivity">
     <item
         android:id="@+id/linkNote"
-        app:showAsAction="always"
-        android:title="@string/linksNote">
+        android:icon="@mipmap/ic_link_variant_white"
+        android:title="@string/linksNote"
+        app:showAsAction="ifRoom">
     </item>
     <item
         android:id="@+id/addedPhoto"
-        android:title="@string/addedPhoto">
+        android:icon="@mipmap/ic_camera_white"
+        android:title="@string/addedPhoto"
+        app:showAsAction="ifRoom">
     </item>
 </menu>

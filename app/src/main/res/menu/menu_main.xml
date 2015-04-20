@@ -5,8 +5,8 @@
         android:orderInCategory="100" app:showAsAction="never" />
     <item
         android:id="@+id/createNote"
-        android:icon="@android:drawable/ic_menu_add"
-        app:showAsAction="always"
-        android:title="@string/createNote">
+        android:icon="@mipmap/ic_plus_white"
+        android:title="@string/createNote"
+        app:showAsAction="ifRoom">
     </item>
 </menu>
