@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="mainAppColor" type="color">#ff4e6cf0</item>
-    <item name="mainAppColorDark" type="color">#ff435fdd</item>
-    <item name="floatingButtonColor" type="color">#ffe91c61</item>
+    <item name="mainAppColor" type="color">#2196F3</item>
+    <item name="mainAppColorDark" type="color">#1976D2</item>
+    <item name="floatingButtonColor" type="color">#FF4081</item>
     <item name="floatingButtonPressedColor" type="color">#ffa71c53</item>
 </resources>

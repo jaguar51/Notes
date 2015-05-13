@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/mainAppColor</item>
         <item name="colorAccent">@color/mainAppColor</item>
         <item name="colorPrimaryDark">@color/mainAppColorDark</item>
+
     </style>
 
 </resources>

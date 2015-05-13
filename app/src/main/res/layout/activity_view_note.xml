@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:inputType="textMultiLine"
-        android:gravity="left|top"
+        android:gravity="start|top"
         android:ems="10"
         android:id="@+id/noteTxt"
         android:layout_gravity="center_horizontal"
