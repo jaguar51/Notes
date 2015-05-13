@@ -13,6 +13,6 @@
         android:id="@+id/addedPhoto"
         android:icon="@mipmap/ic_camera_white"
         android:title="@string/addedPhoto"
-        app:showAsAction="never">
+        app:showAsAction="ifRoom">
     </item>
 </menu>
