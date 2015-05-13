@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.util.Log;
 import android.util.Pair;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -50,9 +51,9 @@ public class MainActivity extends ActionBarActivity {
 
     private static final int CM_DELETE = 1;
 
-    static private final String FILE_NAME = "notes";
-    static private final String FILE_NAME_LINKS = "links";
-    static private final String FILE_NAME_PHOTOS = "photos";
+    private static final String FILE_NAME = "notes";
+    private static final String FILE_NAME_PHOTOS = "photos";
+    private static final String FILE_NAME_LINKS = "links";
 
     private Note tmpNote;
 
@@ -65,42 +66,53 @@ public class MainActivity extends ActionBarActivity {
 
         notesList = (ListView) findViewById(R.id.notesListView);
         notesAdapter = new NotesAdapter(this, notes);
-        registerForContextMenu(notesList);
+//        registerForContextMenu(notesList);
         notesList.setAdapter(notesAdapter);
-//        notesList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-//
-//        notesList.setMultiChoiceModeListener(new MultiChoiceModeListener() {
-//            @Override
-//            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-//                Log.d("mLog", "position = " + position + ", checked = "
-//                        + checked);
-//            }
-//
-//            @Override
-//            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-//                mode.getMenuInflater().inflate(R.menu.context_main, menu);
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-//                if (item.getItemId() == R.id.deleteNotes) {
-//
-//                    mode.finish();
-//                }
-//                return true;
-//            }
-//
-//            @Override
-//            public void onDestroyActionMode(ActionMode mode) {
-//
-//            }
-//        });
+        notesList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
+        notesList.setMultiChoiceModeListener(new MultiChoiceModeListener() {
+            private boolean selectedItems[] = new boolean[notes.size()];
+
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                selectedItems[position]=checked;
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                for(int i=0; i<selectedItems.length; i++) selectedItems[i]=false;
+                mode.getMenuInflater().inflate(R.menu.context_main, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                if (item.getItemId() == R.id.deleteNotes) {
+                    for(int index=selectedItems.length-1; index>=0; index--) {
+                        if (selectedItems[index]) {
+//                            Log.d("myLog", Integer.toString(index));
+                            removeLinksFromFile(notes.get(index).getId());
+                            removePhotosFromFile(notes.get(index).getId());
+                            notes.remove(index);
+                            writeNotesToFile();
+                            notesAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    mode.finish();
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+
+            }
+        });
 
 
         notesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
