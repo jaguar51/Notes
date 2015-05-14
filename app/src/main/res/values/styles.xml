@@ -6,7 +6,12 @@
         <item name="colorPrimary">@color/mainAppColor</item>
         <item name="colorAccent">@color/mainAppColor</item>
         <item name="colorPrimaryDark">@color/mainAppColorDark</item>
-
+        <item name="android:colorActivatedHighlight">@color/actionModeColor</item>
+        <!-- Set Action Mode Style-->
+        <!--<item name="actionModeStyle">@style/LStyled.ActionMode</item>-->
     </style>
 
+    <style name="LStyled.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
+        <item name="background">@color/actionModeColor</item>
+    </style>
 </resources>

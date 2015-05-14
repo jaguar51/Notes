@@ -4,10 +4,8 @@ import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.util.Log;
 import android.util.Pair;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -66,21 +64,25 @@ public class MainActivity extends ActionBarActivity {
 
         notesList = (ListView) findViewById(R.id.notesListView);
         notesAdapter = new NotesAdapter(this, notes);
-//        registerForContextMenu(notesList);
         notesList.setAdapter(notesAdapter);
         notesList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
         notesList.setMultiChoiceModeListener(new MultiChoiceModeListener() {
-            private boolean selectedItems[] = new boolean[notes.size()];
+            private boolean selectedItems[];
+            private int countSelectedItems;
 
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
                 selectedItems[position]=checked;
+                countSelectedItems += checked ? 1 : -1;
+                mode.setTitle(Integer.toString(countSelectedItems));
             }
 
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                selectedItems=new boolean[notes.size()];
                 for(int i=0; i<selectedItems.length; i++) selectedItems[i]=false;
+                countSelectedItems=0;
                 mode.getMenuInflater().inflate(R.menu.context_main, menu);
                 return true;
             }
@@ -90,12 +92,12 @@ public class MainActivity extends ActionBarActivity {
                 if (item.getItemId() == R.id.deleteNotes) {
                     for(int index=selectedItems.length-1; index>=0; index--) {
                         if (selectedItems[index]) {
-//                            Log.d("myLog", Integer.toString(index));
                             removeLinksFromFile(notes.get(index).getId());
                             removePhotosFromFile(notes.get(index).getId());
                             notes.remove(index);
                             writeNotesToFile();
                             notesAdapter.notifyDataSetChanged();
+//                            Log.d("Notes", "Note with index " + Integer.toString(index) + "was deleted.");
                         }
                     }
                     mode.finish();
@@ -154,12 +156,6 @@ public class MainActivity extends ActionBarActivity {
                 tmpNote.setSubject(data.getStringExtra("subject"));
                 for (int i = 0; i < notes.size(); i++) {
                     if(notes.get(i).getId() == tmpNote.getId()) {
-                            /*if (tmpNote.getText().isEmpty() && tmpNote.getSubject().isEmpty()) {
-                                //removeLinksFromFile(notes.get(i).getId());
-                                notes.remove(i);
-                                notesAdapter.notifyDataSetChanged();
-                                break;
-                            }*/
                         notes.get(i).setSubject(tmpNote.getSubject());
                         notes.get(i).setText(tmpNote.getText());
                         break;
@@ -185,7 +181,6 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }

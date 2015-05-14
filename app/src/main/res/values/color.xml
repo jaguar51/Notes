@@ -4,4 +4,5 @@
     <item name="mainAppColorDark" type="color">#1976D2</item>
     <item name="floatingButtonColor" type="color">#FF4081</item>
     <item name="floatingButtonPressedColor" type="color">#ffa71c53</item>
+    <item name="actionModeColor" type="color">#ff898989</item>
 </resources>
