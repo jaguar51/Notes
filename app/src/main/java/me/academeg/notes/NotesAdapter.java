@@ -11,6 +11,8 @@ import java.util.ArrayList;
 
 
 public class NotesAdapter extends BaseAdapter {
+    private static final int MAX_LENGTH_TEXT = 40;
+
     private Context ctx;
     protected LayoutInflater lInflater;
     protected ArrayList<Note> objects;
@@ -51,9 +53,9 @@ public class NotesAdapter extends BaseAdapter {
     }
 
     protected String cutText(String txt) {
-        String res = txt.substring(0, (txt.length() < 35 ? txt.length() : 35));
+        String res = txt.substring(0, (txt.length() < MAX_LENGTH_TEXT ? txt.length() : MAX_LENGTH_TEXT));
         res = res.replace('\n', ' ');
-        if (txt.length() >= 35) res += "...";
+        if (txt.length() >= MAX_LENGTH_TEXT) res += "...";
         return res;
     }
 }
