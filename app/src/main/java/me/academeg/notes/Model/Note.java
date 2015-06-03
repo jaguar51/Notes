@@ -2,20 +2,22 @@ package me.academeg.notes.Model;
 
 
 public class Note {
+
+    private int id;
     private String subject;
     private String text;
-    private long id;
 
-    public Note (long _id) {
-        id = _id;
-        subject = "";
-        text = "";
+
+    public Note (int id) {
+        this.id = id;
+        this.subject = "";
+        this.text = "";
     }
 
-    Note(long _id, String sub, String txt) {
-        id = _id;
-        subject = sub;
-        text = txt;
+    public Note(int id, String sub, String txt) {
+        this.id = id;
+        this.subject = sub;
+        this.text = txt;
     }
 
     public String getSubject() {
@@ -34,11 +36,8 @@ public class Note {
         text = txt;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    private void setId(long _id) {
-        id = _id;
-    }
 }

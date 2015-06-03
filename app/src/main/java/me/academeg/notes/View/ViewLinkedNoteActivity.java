@@ -125,7 +125,7 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
                 Node fstNode = nodeLst.item(i);
                 if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element fstElem = (Element) fstNode;
-                    Note tmNote = new Note(Long.parseLong(((Element)(fstElem.getElementsByTagName("id").item(0))).getTextContent()));
+                    Note tmNote = new Note(Integer.parseInt(((Element)(fstElem.getElementsByTagName("id").item(0))).getTextContent()));
                     if(tmNote.getId() == noteID)
                         continue;
                     tmNote.setSubject(((Element) (fstElem.getElementsByTagName("subject").item(0))).getTextContent());
