@@ -36,7 +36,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
     private static final int CM_DELETE = 1;
 
-    private long noteID;
+    private int noteID;
     private ArrayList<String> thisPhotoId = new ArrayList<String>();
     private ArrayList<Pair<Long, String>> otherPhotoId = new ArrayList<Pair<Long, String>>(); // пары связей
 
@@ -50,7 +50,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        noteID = intent.getLongExtra("id", -1);
+        noteID = intent.getIntExtra("id", -1);
         readPhotosFromFile();
 
         //Find photoList and set adapter

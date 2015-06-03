@@ -139,11 +139,11 @@ public class ViewNoteActivity extends ActionBarActivity {
 //            startActivity(intent);
 //        }
 //
-//        if (id == R.id.addedPhoto) {
-//            Intent intent = new Intent(ViewNoteActivity.this, ViewPhotosActivity.class);
-//            intent.putExtra("id", noteID);
-//            startActivity(intent);
-//        }
+        if (id == R.id.addedPhoto) {
+            Intent intent = new Intent(ViewNoteActivity.this, ViewPhotosActivity.class);
+            intent.putExtra("id", noteID);
+            startActivity(intent);
+        }
 
         return super.onOptionsItemSelected(item);
     }
