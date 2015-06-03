@@ -1,4 +1,4 @@
-package me.academeg.notes;
+package me.academeg.notes.View;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -23,6 +23,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
+
+import me.academeg.notes.Control.ImageAdapter;
+import me.academeg.notes.R;
 
 
 public class ViewPhotosActivity extends ActionBarActivity {

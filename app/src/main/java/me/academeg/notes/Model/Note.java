@@ -1,4 +1,4 @@
-package me.academeg.notes;
+package me.academeg.notes.Model;
 
 
 public class Note {
@@ -6,7 +6,7 @@ public class Note {
     private String text;
     private long id;
 
-    Note (long _id) {
+    public Note (long _id) {
         id = _id;
         subject = "";
         text = "";

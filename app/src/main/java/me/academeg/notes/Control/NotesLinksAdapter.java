@@ -1,4 +1,4 @@
-package me.academeg.notes;
+package me.academeg.notes.Control;
 
 import android.content.Context;
 import android.view.View;
@@ -10,12 +10,15 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import me.academeg.notes.Model.Note;
+import me.academeg.notes.R;
+
 
 public class NotesLinksAdapter extends NotesAdapter {
     private ArrayList<Long> links;
     private long ID;
 
-    NotesLinksAdapter(Context context, ArrayList<Note> notes,
+    public NotesLinksAdapter(Context context, ArrayList<Note> notes,
                       ArrayList<Long> link, long id) {
         super(context, notes);
         links = link;

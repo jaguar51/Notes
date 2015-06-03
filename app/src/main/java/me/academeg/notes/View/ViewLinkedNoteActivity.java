@@ -1,4 +1,4 @@
-package me.academeg.notes;
+package me.academeg.notes.View;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -27,6 +27,10 @@ import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import me.academeg.notes.Model.Note;
+import me.academeg.notes.Control.NotesLinksAdapter;
+import me.academeg.notes.R;
 
 
 public class ViewLinkedNoteActivity extends ActionBarActivity {

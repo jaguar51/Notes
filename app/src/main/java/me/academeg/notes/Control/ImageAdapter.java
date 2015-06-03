@@ -1,4 +1,4 @@
-package me.academeg.notes;
+package me.academeg.notes.Control;
 
 import android.content.Context;
 import android.graphics.Bitmap;
