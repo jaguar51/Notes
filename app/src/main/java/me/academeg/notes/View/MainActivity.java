@@ -1,4 +1,4 @@
-package me.academeg.notes;
+package me.academeg.notes.View;
 
 import android.content.Intent;
 import android.os.Environment;
@@ -36,6 +36,10 @@ import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import me.academeg.notes.Model.Note;
+import me.academeg.notes.Control.NotesAdapter;
+import me.academeg.notes.R;
 
 
 public class MainActivity extends ActionBarActivity {
