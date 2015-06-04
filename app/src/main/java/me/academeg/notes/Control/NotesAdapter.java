@@ -14,7 +14,7 @@ import me.academeg.notes.R;
 
 
 public class NotesAdapter extends BaseAdapter {
-    private static final int MAX_LENGTH_TEXT = 40;
+    private static final int MAX_LENGTH_TEXT = 65;
 
     private Context ctx;
     protected LayoutInflater lInflater;
