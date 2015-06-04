@@ -1,4 +1,4 @@
-package me.academeg.notes;
+package me.academeg.notes.Control;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,15 +9,18 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import me.academeg.notes.Model.Note;
+import me.academeg.notes.R;
+
 
 public class NotesAdapter extends BaseAdapter {
-    private static final int MAX_LENGTH_TEXT = 40;
+    private static final int MAX_LENGTH_TEXT = 65;
 
     private Context ctx;
     protected LayoutInflater lInflater;
     protected ArrayList<Note> objects;
 
-    NotesAdapter(Context context, ArrayList<Note> notes) {
+    public NotesAdapter(Context context, ArrayList<Note> notes) {
         ctx = context;
         objects = notes;
         lInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

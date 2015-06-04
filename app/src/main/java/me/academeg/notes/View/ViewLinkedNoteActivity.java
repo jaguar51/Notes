@@ -1,10 +1,11 @@
-package me.academeg.notes;
+package me.academeg.notes.View;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,33 +13,27 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import me.academeg.notes.Model.Note;
+import me.academeg.notes.Control.NotesLinksAdapter;
+import me.academeg.notes.Model.NotesDatabaseHelper;
+import me.academeg.notes.R;
 
 
 public class ViewLinkedNoteActivity extends ActionBarActivity {
     private static final String FILE_NAME = "notes";
     private static final String FILE_NAME_LINKS = "links";
 
-    private long noteID;
-    private ArrayList<Note> notes = new ArrayList<Note>();
+    private NotesDatabaseHelper notesDatabase;
+
+    private int noteID;
+    private ArrayList<Note> noteArrayList = new ArrayList<Note>();
     private NotesLinksAdapter notesLinksAdapter;
-    private ListView notesList;
-    private ArrayList<Pair<Long, Long>> linkNote = new ArrayList<Pair<Long, Long>>(); // пары связей
-    private ArrayList<Long> thisLinks = new ArrayList<Long>(); // связи для нашей заметки(noteID)
+    private ArrayList<Integer> thisLinks = new ArrayList<>(); // связи для нашей заметки(noteID)
+    private ArrayList<Pair<Integer, Integer>> linkNote = new ArrayList<Pair<Integer, Integer>>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,17 +42,17 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        noteID = intent.getLongExtra("id", -1);
-//        Log.d("checkID", String.valueOf(noteID));
+        noteID = intent.getIntExtra("id", -1);
 
-        readNotesFromFile();
+        notesDatabase = new NotesDatabaseHelper(getApplicationContext());
+        getListNotes();
         readLinksFromFile();
 
-        notesList = (ListView) findViewById(R.id.linkedNotesListView);
-        notesLinksAdapter = new NotesLinksAdapter(this, notes, thisLinks, noteID);
+        ListView notesList = (ListView) findViewById(R.id.linkedNotesListView);
+        notesLinksAdapter = new NotesLinksAdapter(this, noteArrayList, thisLinks);
         notesList.setAdapter(notesLinksAdapter);
 
-        notesList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        notesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(ViewLinkedNoteActivity.this);
@@ -98,42 +93,34 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void readNotesFromFile() {
-        try {
-            notes.clear();
+    private void getListNotes() {
+        noteArrayList.clear();
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    openFileInput(FILE_NAME)));
-            String file = "";
-            String tmp;
-            while ((tmp = br.readLine()) != null)
-                file += "\n" + tmp;
-            br.close();
+        SQLiteDatabase sdb = notesDatabase.getReadableDatabase();
+        Cursor cursor = sdb.query(
+                NotesDatabaseHelper.TABLE_NOTE,
+                null,
+                NotesDatabaseHelper.UID + " != " + Integer.toString(this.noteID),
+                null,
+                null,
+                null,
+                NotesDatabaseHelper.UID + " DESC"
+        );
+        
+        int id = cursor.getColumnIndex(NotesDatabaseHelper.UID);
+        int idTitle = cursor.getColumnIndex(NotesDatabaseHelper.NOTE_TITLE);
+        int idText = cursor.getColumnIndex(NotesDatabaseHelper.NOTE_TEXT);
 
-            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            InputSource is = new InputSource();
-            is.setCharacterStream(new StringReader(file));
-            Document doc = db.parse(is);
-
-            NodeList nodeLst = doc.getElementsByTagName("note");
-            //Log.d("sizeNodeList", String.valueOf(nodeLst.getLength()));
-            for (int i = 0; i < nodeLst.getLength(); i++) {
-                Node fstNode = nodeLst.item(i);
-                if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element fstElem = (Element) fstNode;
-                    Note tmNote = new Note(Long.parseLong(((Element)(fstElem.getElementsByTagName("id").item(0))).getTextContent()));
-                    if(tmNote.getId() == noteID)
-                        continue;
-                    tmNote.setSubject(((Element) (fstElem.getElementsByTagName("subject").item(0))).getTextContent());
-                    tmNote.setText(((Element)(fstElem.getElementsByTagName("text").item(0))).getTextContent());
-                    notes.add(tmNote);
-                }
-            }
+        while (cursor.moveToNext()) {
+            noteArrayList.add(new Note(
+                            cursor.getInt(id),
+                            cursor.getString(idTitle),
+                            cursor.getString(idText))
+            );
         }
-        catch (Exception e) {
-            Log.d("Error", "reading");
-            e.printStackTrace();
-        }
+
+        cursor.close();
+        sdb.close();
     }
 
     public void readLinksFromFile() {
@@ -143,8 +130,8 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
 
             Scanner inputLink = new Scanner(openFileInput(FILE_NAME_LINKS));
             while (inputLink.hasNext()) {
-                long first = inputLink.nextLong();
-                long second = inputLink.nextLong();
+                int first = inputLink.nextInt();
+                int second = inputLink.nextInt();
                 //Log.d("testRead", String.valueOf(first) + " " + String.valueOf(second));
                 if(first == noteID) {
                     thisLinks.add(second);
