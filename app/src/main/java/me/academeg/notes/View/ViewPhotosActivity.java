@@ -1,6 +1,9 @@
 package me.academeg.notes.View;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
@@ -25,6 +28,8 @@ import java.util.Date;
 import java.util.Scanner;
 
 import me.academeg.notes.Control.ImageAdapter;
+import me.academeg.notes.Model.Note;
+import me.academeg.notes.Model.NotesDatabaseHelper;
 import me.academeg.notes.R;
 
 
@@ -32,14 +37,12 @@ public class ViewPhotosActivity extends ActionBarActivity {
     private static final int GALLERY_REQUEST = 1;
 
     private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";
-    private static final String FILE_NAME_PHOTOS = "photos";
 
     private static final int CM_DELETE = 1;
 
+    private NotesDatabaseHelper notesDatabase;
     private int noteID;
-    private ArrayList<String> thisPhotoId = new ArrayList<String>();
-    private ArrayList<Pair<Long, String>> otherPhotoId = new ArrayList<Pair<Long, String>>(); // пары связей
-
+    private ArrayList<String> thisPhotoName = new ArrayList<String>();
     private ImageAdapter imageAdapter;
 
 
@@ -51,14 +54,58 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
         noteID = intent.getIntExtra("id", -1);
-        readPhotosFromFile();
+        notesDatabase = new NotesDatabaseHelper(getApplicationContext());
+        getPhotosName();
 
         //Find photoList and set adapter
         GridView photoGridView = (GridView) findViewById(R.id.photoGridView);
-        imageAdapter = new ImageAdapter(this, thisPhotoId);
+        imageAdapter = new ImageAdapter(this, thisPhotoName);
         photoGridView.setAdapter(imageAdapter);
         registerForContextMenu(photoGridView);
         photoGridView.setOnItemClickListener(gridviewOnItemClickListener);
+    }
+
+
+    private void getPhotosName() {
+        thisPhotoName.clear();
+
+        SQLiteDatabase sdb = notesDatabase.getReadableDatabase();
+        Cursor cursor = sdb.query(
+                NotesDatabaseHelper.TABLE_PHOTO,
+                null,
+                "note" + NotesDatabaseHelper.UID + " = " + Integer.toString(noteID),
+                null,
+                null,
+                null,
+                NotesDatabaseHelper.PHOTO_NAME + " DESC"
+        );
+
+        int idPhotoName = cursor.getColumnIndex(NotesDatabaseHelper.PHOTO_NAME);
+        while (cursor.moveToNext()) {
+            thisPhotoName.add(cursor.getString(idPhotoName));
+        }
+
+        cursor.close();
+        sdb.close();
+    }
+
+    private void addNewPhotoToDB(String namePhoto) {
+        SQLiteDatabase sdb = notesDatabase.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("note" + NotesDatabaseHelper.UID, noteID);
+        cv.put(NotesDatabaseHelper.PHOTO_NAME, namePhoto);
+        sdb.insert(NotesDatabaseHelper.TABLE_PHOTO, null, cv);
+        sdb.close();
+    }
+
+    private void deletePhoto(String namePhoto) {
+        SQLiteDatabase sdb = notesDatabase.getWritableDatabase();
+        sdb.delete(
+                NotesDatabaseHelper.TABLE_PHOTO,
+                NotesDatabaseHelper.PHOTO_NAME + " =  ?",
+                new String[] { namePhoto }
+        );
+        sdb.close();
     }
 
     private GridView.OnItemClickListener gridviewOnItemClickListener = new GridView.OnItemClickListener() {
@@ -69,7 +116,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
             Intent in = new Intent();
             in.setAction(Intent.ACTION_VIEW);
-            File sdPath = new File(PATCH_PHOTOS + thisPhotoId.get(position));
+            File sdPath = new File(PATCH_PHOTOS + thisPhotoName.get(position));
             Uri selectImage = Uri.fromFile(sdPath);
             in.setDataAndType(selectImage, "image/*");
             startActivity(in);
@@ -94,8 +141,8 @@ public class ViewPhotosActivity extends ActionBarActivity {
                 }
                 String fileName = generateFileName();
                 writePhotoToCache(fileName, galleryPic);
-                thisPhotoId.add(fileName);
-                writePhotosToFile();
+                thisPhotoName.add(fileName);
+                addNewPhotoToDB(fileName);
                 imageAdapter.notifyDataSetChanged();
 
                 return;
@@ -149,12 +196,11 @@ public class ViewPhotosActivity extends ActionBarActivity {
         if (item.getItemId() == CM_DELETE) {
             AdapterView.AdapterContextMenuInfo acmi =
                     (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            //removeLinksFromFile(notes.get(acmi.position).getId());
 
-            File deletePhotoFile = new File(PATCH_PHOTOS + thisPhotoId.get(acmi.position));
+            File deletePhotoFile = new File(PATCH_PHOTOS + thisPhotoName.get(acmi.position));
             deletePhotoFile.delete();
-            thisPhotoId.remove(acmi.position);
-            writePhotosToFile();
+            deletePhoto(thisPhotoName.get(acmi.position));
+            thisPhotoName.remove(acmi.position);
             imageAdapter.notifyDataSetChanged();
             return true;
         }
@@ -168,55 +214,6 @@ public class ViewPhotosActivity extends ActionBarActivity {
         SimpleDateFormat ft =
                 new SimpleDateFormat ("yyyyMMdd_HHmmss");
         return ft.format(dNow);
-    }
-
-    public void writePhotosToFile() {
-        try {
-            PrintWriter outputLink = new PrintWriter(openFileOutput(
-                    FILE_NAME_PHOTOS, MODE_PRIVATE));
-
-            for (int i = 0; i < otherPhotoId.size(); i++) {
-                outputLink.print(otherPhotoId.get(i).first);
-                outputLink.print(" ");
-                outputLink.println(otherPhotoId.get(i).second);
-            }
-
-            for (int i = 0; i < thisPhotoId.size(); i++) {
-                outputLink.print(noteID);
-                outputLink.print(" ");
-                outputLink.println(thisPhotoId.get(i));
-            }
-
-            outputLink.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void readPhotosFromFile() {
-        try {
-            thisPhotoId.clear();
-            otherPhotoId.clear();
-
-            Scanner inputPhotos = new Scanner(openFileInput(FILE_NAME_PHOTOS));
-            while (inputPhotos.hasNext()) {
-                long idNote = inputPhotos.nextLong();
-                String idPhoto = inputPhotos.nextLine();
-                idPhoto = idPhoto.trim();
-
-                //Log.d("testRead", String.valueOf(idNote) + " " + String.valueOf(idPhoto));
-                if(idNote == noteID) {
-                    thisPhotoId.add(idPhoto);
-                    continue;
-                }
-                otherPhotoId.add(Pair.create(idNote, idPhoto));
-            }
-            inputPhotos.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void writePhotoToCache(String fileName, Bitmap galleryPic) {

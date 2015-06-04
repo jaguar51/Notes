@@ -3,14 +3,10 @@ package me.academeg.notes.View;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 import android.view.ActionMode;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,24 +16,7 @@ import android.widget.ListView;
 
 import com.melnykov.fab.FloatingActionButton;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Scanner;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import me.academeg.notes.Model.Note;
 import me.academeg.notes.Control.NotesAdapter;
@@ -54,9 +33,6 @@ public class MainActivity extends ActionBarActivity {
 
     private static final int REQUEST_CODE_EDIT_NOTE = 1;
     private static final int REQUEST_CODE_CREATE_NOTE = 2;
-
-    private static final String FILE_NAME_PHOTOS = "photos";
-    private static final String FILE_NAME_LINKS = "links";
 
 
     @Override
@@ -210,106 +186,14 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-//    @Override
-//    public void onCreateContextMenu(ContextMenu menu, View v,
-//                                    ContextMenuInfo menuInfo) {
-//        super.onCreateContextMenu(menu, v, menuInfo);
-//        menu.add(0, CM_DELETE, 0, R.string.deleteNote);
-//    }
-
-//    @Override
-//    public boolean onContextItemSelected(MenuItem item) {
-//        if (item.getItemId() == CM_DELETE) {
-//            AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-//            removeLinksFromFile(noteArrayList.get(acmi.position).getId());
-//            removePhotosFromFile(noteArrayList.get(acmi.position).getId());
-//            noteArrayList.remove(acmi.position);
-////            writeNotesToFile();
-//            notesAdapter.notifyDataSetChanged();
-//            return true;
-//        }
-//
-//        return super.onContextItemSelected(item);
-//    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-//        if (tmpNote != null) {
-//            outState.putInt("tmpNoteId", tmpNote.getId());
-//        }
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle instanceState) {
-        super.onRestoreInstanceState(instanceState);
-//        tmpNote = new Note(instanceState.getInt("tmpNoteId"));
-    }
-
-
     public void removeLinksFromFile(long noteID) {
         ArrayList<Pair<Long, Long>> linkNote = new ArrayList<Pair<Long, Long>>();
 
-        try {
-            linkNote.clear();
-            Scanner inputLink = new Scanner(openFileInput(FILE_NAME_LINKS));
-            while (inputLink.hasNext()) {
-                long first = inputLink.nextLong();
-                long second = inputLink.nextLong();
-                if (first != noteID && second != noteID)
-                    linkNote.add(Pair.create(first, second));
-            }
-            inputLink.close();
-
-            PrintWriter outputLink = new PrintWriter(openFileOutput(
-                    FILE_NAME_LINKS, MODE_PRIVATE));
-            for (int i = 0; i < linkNote.size(); i++) {
-                outputLink.print(linkNote.get(i).first);
-                outputLink.print(" ");
-                outputLink.println(linkNote.get(i).second);
-            }
-            outputLink.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void removePhotosFromFile(long noteID) {
         ArrayList<Pair<Long, String>> photoId = new ArrayList<Pair<Long, String>>();
 
-        try {
-            Scanner inputPhotos = new Scanner(openFileInput(FILE_NAME_PHOTOS));
-            while (inputPhotos.hasNext()) {
-                long idNote = inputPhotos.nextLong();
-                String idPhoto = inputPhotos.nextLine();
-                idPhoto = idPhoto.trim();
-                //Log.d("testRead", String.valueOf(idNote) + " " + String.valueOf(idPhoto));
-                if(idNote == noteID) {
-                    File deletePhotoFile = new File(Environment.getExternalStorageDirectory().getPath() + "/.notes/" + idPhoto);
-                    deletePhotoFile.delete();
-                    continue;
-                }
-                photoId.add(Pair.create(idNote, idPhoto));
-            }
-            inputPhotos.close();
-
-            PrintWriter outputLink = new PrintWriter(openFileOutput(
-                    FILE_NAME_PHOTOS, MODE_PRIVATE));
-
-            for (int i = 0; i < photoId.size(); i++) {
-                outputLink.print(photoId.get(i).first);
-                outputLink.print(" ");
-                outputLink.println(photoId.get(i).second);
-            }
-            outputLink.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
-
-
 
 }
