@@ -91,7 +91,6 @@ public class ImageAdapter extends BaseAdapter {
                                              int reqHeight) {
 
         Bitmap bm = null;
-        // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path, options);
@@ -99,9 +98,9 @@ public class ImageAdapter extends BaseAdapter {
         // Calculate inSampleSize
         options.inSampleSize = calculateInSampleSize(options, reqWidth,
                 reqHeight);
-
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
         bm = BitmapFactory.decodeFile(path, options);
 
         return bm;
