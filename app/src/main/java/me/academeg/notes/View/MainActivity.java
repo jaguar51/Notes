@@ -3,9 +3,9 @@ package me.academeg.notes.View;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Pair;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import com.melnykov.fab.FloatingActionButton;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import me.academeg.notes.Model.Note;
@@ -25,6 +26,8 @@ import me.academeg.notes.R;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";
 
     private NotesAdapter notesAdapter;
     private ArrayList<Note> noteArrayList = new ArrayList<Note>();
@@ -74,14 +77,8 @@ public class MainActivity extends ActionBarActivity {
                     SQLiteDatabase sdb = notesDatabase.getWritableDatabase();
                     for(int index=selectedItems.length-1; index>=0; index--) {
                         if (selectedItems[index]) {
-//                            removeLinksFromFile(noteArrayList.get(index).getId());
-//                            removePhotosFromFile(noteArrayList.get(index).getId());
-                            sdb.delete(
-                                    NotesDatabaseHelper.TABLE_NOTE,
-                                    NotesDatabaseHelper.UID + " = "
-                                    + Integer.toString(noteArrayList.get(index).getId()),
-                                    null
-                            );
+                            removePhotos(noteArrayList.get(index).getId(), sdb);
+                            deleteNote(noteArrayList.get(index).getId(), sdb);
                             noteArrayList.remove(index);
 //                            Log.d("Notes", "Note with index " + Integer.toString(index) + "was deleted.");
                         }
@@ -186,14 +183,51 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void removeLinksFromFile(long noteID) {
-        ArrayList<Pair<Long, Long>> linkNote = new ArrayList<Pair<Long, Long>>();
+//    public void removeLinksFromFile(int noteID) {
+//        ArrayList<Pair<Long, Long>> linkNote = new ArrayList<Pair<Long, Long>>();
+//
+//    }
 
+    public void removePhotos(int noteID, SQLiteDatabase sdb) {
+        ArrayList<String> photoName = new ArrayList<>();
+        Cursor cursor = sdb.query(
+                NotesDatabaseHelper.TABLE_PHOTO,
+                null,
+                "note" + NotesDatabaseHelper.UID + " = " + Integer.toString(noteID),
+                null,
+                null,
+                null,
+                null
+        );
+
+        int idPhotoName = cursor.getColumnIndex(NotesDatabaseHelper.PHOTO_NAME);
+        while (cursor.moveToNext()) {
+            photoName.add(cursor.getString(idPhotoName));
+        }
+        cursor.close();
+
+        for (String name : photoName) {
+            File deletePhotoFile = new File(PATCH_PHOTOS + name);
+            deletePhotoFile.delete();
+        }
     }
 
-    public void removePhotosFromFile(long noteID) {
-        ArrayList<Pair<Long, String>> photoId = new ArrayList<Pair<Long, String>>();
+    public void deleteNote(int noteID, SQLiteDatabase sdb) {
+        // delete note
+        sdb.delete(
+                NotesDatabaseHelper.TABLE_PHOTO,
+                "note" + NotesDatabaseHelper.UID + " = ?",
+                new String[]{ Integer.toString(noteID) }
+        );
 
+        // delete photos
+        sdb.delete(
+                NotesDatabaseHelper.TABLE_NOTE,
+                NotesDatabaseHelper.UID + " = "
+                        + Integer.toString(noteID),
+                null
+        );
     }
+
 
 }

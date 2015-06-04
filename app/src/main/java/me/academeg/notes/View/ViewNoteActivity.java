@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -80,38 +79,7 @@ public class ViewNoteActivity extends ActionBarActivity {
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();
-        boolean changes = false;
-
-        String titleNote = titleEditText.getText().toString();
-        String textNote = textEditText.getText().toString();
-
-        SQLiteDatabase sdb = notesDatabaseHelper.getWritableDatabase();
-        if(noteID == -1) {
-
-            if (!titleNote.isEmpty() || !textNote.isEmpty()) {
-                ContentValues cv = new ContentValues();
-                cv.put(NotesDatabaseHelper.NOTE_TITLE, titleNote);
-                cv.put(NotesDatabaseHelper.NOTE_TEXT, textNote);
-                sdb.insert(NotesDatabaseHelper.TABLE_NOTE, null, cv);
-
-                changes = true;
-            }
-            sdb.close();
-            notesDatabaseHelper.close();
-        }
-        else {
-            ContentValues cv = new ContentValues();
-            cv.put(NotesDatabaseHelper.NOTE_TITLE, titleNote);
-            cv.put(NotesDatabaseHelper.NOTE_TEXT, textNote);
-            sdb.update(
-                    NotesDatabaseHelper.TABLE_NOTE,
-                    cv,
-                    NotesDatabaseHelper.UID + " = ?",
-                    new String[] { Integer.toString(noteID) }
-            );
-            changes = true;
-        }
-
+        boolean changes = saveNote();
         intent.putExtra("changes", changes);
         setResult(RESULT_OK, intent);
         finish();
@@ -146,6 +114,38 @@ public class ViewNoteActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean saveNote() {
+        boolean changes = false;
+
+        String titleNote = titleEditText.getText().toString();
+        String textNote = textEditText.getText().toString();
+
+        SQLiteDatabase sdb = notesDatabaseHelper.getWritableDatabase();
+        if(noteID == -1) {
+            if (!titleNote.isEmpty() || !textNote.isEmpty()) {
+                ContentValues cv = new ContentValues();
+                cv.put(NotesDatabaseHelper.NOTE_TITLE, titleNote);
+                cv.put(NotesDatabaseHelper.NOTE_TEXT, textNote);
+                sdb.insert(NotesDatabaseHelper.TABLE_NOTE, null, cv);
+                changes = true;
+            }
+        }
+        else {
+            ContentValues cv = new ContentValues();
+            cv.put(NotesDatabaseHelper.NOTE_TITLE, titleNote);
+            cv.put(NotesDatabaseHelper.NOTE_TEXT, textNote);
+            sdb.update(
+                    NotesDatabaseHelper.TABLE_NOTE,
+                    cv,
+                    NotesDatabaseHelper.UID + " = ?",
+                    new String[] { Integer.toString(noteID) }
+            );
+            changes = true;
+        }
+        sdb.close();
+        return changes;
     }
 
 }
