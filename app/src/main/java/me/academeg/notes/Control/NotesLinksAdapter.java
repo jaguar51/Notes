@@ -1,4 +1,4 @@
-package me.academeg.notes;
+package me.academeg.notes.Control;
 
 import android.content.Context;
 import android.view.View;
@@ -10,13 +10,23 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import me.academeg.notes.Model.Note;
+import me.academeg.notes.R;
+
 
 public class NotesLinksAdapter extends NotesAdapter {
-    private ArrayList<Long> links;
+    private ArrayList<Integer> links;
     private long ID;
 
-    NotesLinksAdapter(Context context, ArrayList<Note> notes,
-                      ArrayList<Long> link, long id) {
+
+    public NotesLinksAdapter(Context context, ArrayList<Note> notes,
+                             ArrayList<Integer> links) {
+        super(context, notes);
+        this.links = links;
+    }
+
+    public NotesLinksAdapter(Context context, ArrayList<Note> notes,
+                      ArrayList<Integer> link, long id) {
         super(context, notes);
         links = link;
         ID = id;
@@ -47,7 +57,7 @@ public class NotesLinksAdapter extends NotesAdapter {
     OnCheckedChangeListener myCheckChangList = new OnCheckedChangeListener() {
         public void onCheckedChanged(CompoundButton buttonView,
                                      boolean isChecked) {
-            long curID = getItem((Integer) buttonView.getTag()).getId();
+            int curID = getItem((Integer) buttonView.getTag()).getId();
             if(!isChecked) {
                 for (int i = 0; i < links.size(); i++) {
                     if (links.get(i) == curID)
