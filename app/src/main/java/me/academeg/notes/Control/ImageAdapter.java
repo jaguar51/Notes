@@ -144,6 +144,7 @@ public class ImageAdapter extends BaseAdapter {
         int position;
     }
 
+    // Async load image to bitmap
     class BitmapLoader extends AsyncTask<ViewHolder, Void, Bitmap> {
         private ViewHolder view;
 

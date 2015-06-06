@@ -141,7 +141,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
                 }
                 String fileName = generateFileName();
                 writePhotoToCache(fileName, galleryPic);
-                thisPhotoName.add(fileName);
+                thisPhotoName.add(0, fileName);
                 addNewPhotoToDB(fileName);
                 imageAdapter.notifyDataSetChanged();
 
