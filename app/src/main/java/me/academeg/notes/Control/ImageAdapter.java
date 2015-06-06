@@ -13,6 +13,8 @@ import android.widget.ImageView;
 
 import java.util.ArrayList;
 
+import me.academeg.notes.Model.SquaredImageView;
+
 
 public class ImageAdapter extends BaseAdapter {
     private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";
@@ -45,13 +47,11 @@ public class ImageAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
 
-        ImageView imageView;
+        SquaredImageView imageView;
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
-            imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(350, 350));
+            imageView = new SquaredImageView(mContext);
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(8, 8, 8, 8);
 
             convertView = imageView;
 
@@ -62,7 +62,7 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
             holder.position = position;
-            ((ImageView) convertView).setImageBitmap(null);
+            ((SquaredImageView) convertView).setImageBitmap(null);
         }
 
         // Async load image to imageView
@@ -126,7 +126,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     class ViewHolder {
-        ImageView image;
+        SquaredImageView image;
         int position;
     }
 
