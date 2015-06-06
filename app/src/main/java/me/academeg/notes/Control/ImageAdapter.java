@@ -5,10 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.util.LruCache;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
@@ -22,9 +22,26 @@ public class ImageAdapter extends BaseAdapter {
     private Context mContext;
     private ArrayList<String> mThumbIds;
 
+    private LruCache<String, Bitmap> mMemoryCache;
+
     public ImageAdapter(Context c, ArrayList<String> arrayList) {
         mContext = c;
         mThumbIds = arrayList;
+
+        // Get max available VM memory, exceeding this amount will throw an
+        // OutOfMemory exception. Stored in kilobytes as LruCache takes an
+        // int in its constructor.
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        // Use 1/8th of the available memory for this memory cache.
+        final int cacheSize = maxMemory / 8;
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
     }
 
     @Override
@@ -62,29 +79,22 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
             holder.position = position;
-//            ((SquaredImageView) convertView).setImageBitmap(null);
         }
 
         // Async load image to imageView
-        new AsyncTask<ViewHolder, Void, Bitmap>() {
-            private ViewHolder view;
-
-            @Override
-            protected Bitmap doInBackground(ViewHolder... params) {
-                view = params[0];
-                Bitmap bm = decodeSampledBitmapFromUri(
-                        PATCH_PHOTOS + mThumbIds.get(view.position), 250, 250);
-                return bm;
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                super.onPostExecute(bitmap);
-                view.image.setImageBitmap(bitmap);
-            }
-        }.execute(holder);
-
+        BitmapLoader task = new BitmapLoader();
+        task.execute(holder);
         return convertView;
+    }
+
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    public Bitmap getBitmapFromMemCache(String key) {
+        return mMemoryCache.get(key);
     }
 
     public Bitmap decodeSampledBitmapFromUri(String path, int reqWidth,
@@ -128,9 +138,33 @@ public class ImageAdapter extends BaseAdapter {
         return inSampleSize;
     }
 
+
     static class ViewHolder {
         SquaredImageView image;
         int position;
+    }
+
+    class BitmapLoader extends AsyncTask<ViewHolder, Void, Bitmap> {
+        private ViewHolder view;
+
+        @Override
+        protected Bitmap doInBackground(ViewHolder... params) {
+            view = params[0];
+            String bitmapName = mThumbIds.get(view.position);
+            Bitmap bitmap = getBitmapFromMemCache(bitmapName);
+            if(bitmap == null) {
+                bitmap = decodeSampledBitmapFromUri(
+                        PATCH_PHOTOS + mThumbIds.get(view.position), 250, 250);
+                addBitmapToMemoryCache(bitmapName, bitmap);
+            }
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            view.image.setImageBitmap(bitmap);
+        }
     }
 
 }
