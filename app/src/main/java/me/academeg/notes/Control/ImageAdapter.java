@@ -62,7 +62,7 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
             holder.position = position;
-            ((SquaredImageView) convertView).setImageBitmap(null);
+//            ((SquaredImageView) convertView).setImageBitmap(null);
         }
 
         // Async load image to imageView
@@ -105,7 +105,7 @@ public class ImageAdapter extends BaseAdapter {
         return BitmapFactory.decodeFile(path, options);
     }
 
-    public static int calculateInSampleSize(
+    public int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
@@ -128,7 +128,7 @@ public class ImageAdapter extends BaseAdapter {
         return inSampleSize;
     }
 
-    class ViewHolder {
+    static class ViewHolder {
         SquaredImageView image;
         int position;
     }
