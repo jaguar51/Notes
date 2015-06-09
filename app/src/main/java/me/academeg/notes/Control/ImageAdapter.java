@@ -22,7 +22,7 @@ public class ImageAdapter extends BaseAdapter {
     private Context mContext;
     private ArrayList<String> mThumbIds;
 
-    private LruCache<String, Bitmap> mMemoryCache;
+    private static LruCache<String, Bitmap> mMemoryCache = null;
 
     public ImageAdapter(Context c, ArrayList<String> arrayList) {
         mContext = c;
@@ -34,14 +34,20 @@ public class ImageAdapter extends BaseAdapter {
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         // Use 1/8th of the available memory for this memory cache.
         final int cacheSize = maxMemory / 8;
-        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
-            @Override
-            protected int sizeOf(String key, Bitmap bitmap) {
-                // The cache size will be measured in kilobytes rather than
-                // number of items.
-                return bitmap.getByteCount() / 1024;
-            }
-        };
+        if (mMemoryCache == null) {
+            mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+                @Override
+                protected int sizeOf(String key, Bitmap bitmap) {
+                    // The cache size will be measured in kilobytes rather than
+                    // number of items.
+                    return bitmap.getByteCount() / 1024;
+                }
+            };
+        }
+    }
+
+    public void clearCache() {
+        mMemoryCache.evictAll();
     }
 
     @Override
