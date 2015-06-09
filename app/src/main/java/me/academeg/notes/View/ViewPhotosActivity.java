@@ -153,6 +153,9 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
+        // Clear image cache where we close activity
+        // If screen was rotated cache will not clean
+        imageAdapter.clearCache();
         finish();
     }
 
