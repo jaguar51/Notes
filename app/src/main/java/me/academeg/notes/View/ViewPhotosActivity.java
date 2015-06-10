@@ -141,7 +141,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
                 }
                 String fileName = generateFileName();
                 writePhotoToCache(fileName, galleryPic);
-                thisPhotoName.add(fileName);
+                thisPhotoName.add(0, fileName);
                 addNewPhotoToDB(fileName);
                 imageAdapter.notifyDataSetChanged();
 
@@ -153,6 +153,9 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
+        // Clear image cache where we close activity
+        // If screen was rotated cache will not clean
+        imageAdapter.clearCache();
         finish();
     }
 
