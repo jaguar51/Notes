@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto" >
     <item
         android:id="@+id/deleteNotes"
-        android:icon="@android:drawable/ic_delete"
+        android:icon="@mipmap/ic_delete_white"
         app:showAsAction="ifRoom"
         android:title="@string/delete">
     </item>
