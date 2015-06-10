@@ -12,12 +12,9 @@
         android:id="@+id/photoGridView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:columnWidth="150dp"
+        android:numColumns="@integer/column_count"
         android:gravity="center"
-        android:numColumns="auto_fit"
-        android:stretchMode="columnWidth"
-        android:horizontalSpacing="5dp"
-        android:verticalSpacing="5dp" >
+        android:scrollbarStyle="insideOverlay" >
     </GridView>
 
 </LinearLayout>
