@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import me.academeg.notes.Model.Note;
-import me.academeg.notes.Control.NotesLinksAdapter;
+//import me.academeg.notes.Control.NotesLinksAdapter;
 import me.academeg.notes.Model.NotesDatabaseHelper;
 import me.academeg.notes.R;
 
@@ -31,7 +31,7 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
 
     private int noteID;
     private ArrayList<Note> noteArrayList = new ArrayList<Note>();
-    private NotesLinksAdapter notesLinksAdapter;
+//    private NotesLinksAdapter notesLinksAdapter;
     private ArrayList<Integer> thisLinks = new ArrayList<>(); // связи для нашей заметки(noteID)
     private ArrayList<Pair<Integer, Integer>> linkNote = new ArrayList<Pair<Integer, Integer>>();
 
@@ -49,16 +49,16 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
         readLinksFromFile();
 
         ListView notesList = (ListView) findViewById(R.id.linkedNotesListView);
-        notesLinksAdapter = new NotesLinksAdapter(this, noteArrayList, thisLinks);
-        notesList.setAdapter(notesLinksAdapter);
+//        notesLinksAdapter = new NotesLinksAdapter(this, noteArrayList, thisLinks);
+//        notesList.setAdapter(notesLinksAdapter);
 
         notesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(ViewLinkedNoteActivity.this);
-                Note tmpNote = notesLinksAdapter.getItem(position);
-                builder.setTitle(tmpNote.getSubject());
-                builder.setMessage(tmpNote.getText());
+//                Note tmpNote = notesLinksAdapter.getItem(position);
+//                builder.setTitle(tmpNote.getSubject());
+//                builder.setMessage(tmpNote.getText());
                 AlertDialog alert = builder.create();
                 alert.show();
             }
