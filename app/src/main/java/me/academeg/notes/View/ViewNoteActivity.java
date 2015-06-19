@@ -1,23 +1,21 @@
 package me.academeg.notes.View;
 
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
-import me.academeg.notes.Model.NotesDatabaseHelper;
+import me.academeg.notes.Model.Note;
+import me.academeg.notes.Model.NotesDatabase;
 import me.academeg.notes.R;
 
 
 public class ViewNoteActivity extends ActionBarActivity {
     private static final int REQUEST_TAKE_PHOTO = 2;
     private int noteID;
-    private NotesDatabaseHelper notesDatabaseHelper;
+    private NotesDatabase notesDatabase;
 
     private EditText titleEditText;
     private EditText textEditText;
@@ -28,10 +26,11 @@ public class ViewNoteActivity extends ActionBarActivity {
         setContentView(R.layout.activity_view_note);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        notesDatabase = new NotesDatabase(this);
+        notesDatabase.open();
+
         titleEditText = (EditText) findViewById(R.id.subjectTxt);
         textEditText = (EditText) findViewById(R.id.noteTxt);
-
-        notesDatabaseHelper = new NotesDatabaseHelper(getApplicationContext());
 
         Intent intent = getIntent();
         noteID = intent.getIntExtra("id", -1);
@@ -90,30 +89,20 @@ public class ViewNoteActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        notesDatabase.close();
+    }
+
     private void getNote() {
         if(noteID == -1)
             return;
 
-        SQLiteDatabase sdb = notesDatabaseHelper.getReadableDatabase();
-        Cursor c = sdb.query(
-                NotesDatabaseHelper.TABLE_NOTE,
-                null,
-                NotesDatabaseHelper.UID + "=" + Long.toString(noteID),
-                null,
-                null,
-                null,
-                null
-        );
+        Note tmpNote = notesDatabase.getNote(noteID);
 
-        int idTitle = c.getColumnIndex(NotesDatabaseHelper.NOTE_TITLE);
-        int idText = c.getColumnIndex(NotesDatabaseHelper.NOTE_TEXT);
-        c.moveToNext();
-
-        titleEditText.setText(c.getString(idTitle));
-        textEditText.setText(c.getString(idText));
-
-        c.close();
-        sdb.close();
+        titleEditText.setText(tmpNote.getSubject());
+        textEditText.setText(tmpNote.getText());
     }
 
     public boolean saveNote() {
@@ -122,29 +111,16 @@ public class ViewNoteActivity extends ActionBarActivity {
         String titleNote = titleEditText.getText().toString();
         String textNote = textEditText.getText().toString();
 
-        SQLiteDatabase sdb = notesDatabaseHelper.getWritableDatabase();
         if(noteID == -1) {
             if (!titleNote.isEmpty() || !textNote.isEmpty()) {
-                ContentValues cv = new ContentValues();
-                cv.put(NotesDatabaseHelper.NOTE_TITLE, titleNote);
-                cv.put(NotesDatabaseHelper.NOTE_TEXT, textNote);
-                sdb.insert(NotesDatabaseHelper.TABLE_NOTE, null, cv);
+                notesDatabase.createNote(new Note(-1, titleNote, textNote));
                 changes = true;
             }
         }
         else {
-            ContentValues cv = new ContentValues();
-            cv.put(NotesDatabaseHelper.NOTE_TITLE, titleNote);
-            cv.put(NotesDatabaseHelper.NOTE_TEXT, textNote);
-            sdb.update(
-                    NotesDatabaseHelper.TABLE_NOTE,
-                    cv,
-                    NotesDatabaseHelper.UID + " = ?",
-                    new String[] { Integer.toString(noteID) }
-            );
+            notesDatabase.updateNote(new Note(noteID, titleNote, textNote));
             changes = true;
         }
-        sdb.close();
         return changes;
     }
 

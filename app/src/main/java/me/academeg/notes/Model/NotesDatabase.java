@@ -1,9 +1,11 @@
 package me.academeg.notes.Model;
 
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class NotesDatabase {
 
@@ -36,19 +38,39 @@ public class NotesDatabase {
         );
     }
 
+    public void createNote(Note note) {
+        ContentValues cv = new ContentValues();
+        cv.put(NotesDatabaseHelper.NOTE_TITLE, note.getSubject());
+        cv.put(NotesDatabaseHelper.NOTE_TEXT, note.getText());
+        database.insert(NotesDatabaseHelper.TABLE_NOTE, null, cv);
+    }
+
+    public void updateNote(Note note) {
+        ContentValues cv = new ContentValues();
+        cv.put(NotesDatabaseHelper.NOTE_TITLE, note.getSubject());
+        cv.put(NotesDatabaseHelper.NOTE_TEXT, note.getText());
+        database.update(
+                NotesDatabaseHelper.TABLE_NOTE,
+                cv,
+                NotesDatabaseHelper.UID + " = ?",
+                new String[] { Integer.toString(note.getId()) }
+        );
+    }
+
     public Note getNote(int id) {
         Cursor c = database.query(
                 NotesDatabaseHelper.TABLE_NOTE,
                 null,
-                NotesDatabaseHelper.UID + "=" + Long.toString(id),
+                NotesDatabaseHelper.UID + " = " + Integer.toString(id),
                 null, null, null, null
         );
 
         int idTitle = c.getColumnIndex(NotesDatabaseHelper.NOTE_TITLE);
         int idText = c.getColumnIndex(NotesDatabaseHelper.NOTE_TEXT);
-        c.moveToNext();
+        c.moveToFirst();
+        Note res = new Note(id, c.getString(idTitle), c.getString(idText));
         c.close();
-        return new Note(id, c.getString(idTitle), c.getString(idText));
+        return res;
     }
 
     public void deleteNote(int id) {
@@ -59,7 +81,7 @@ public class NotesDatabase {
                 new String[]{Integer.toString(id)}
         );
 
-//         delete photos
+//         delete all photos
         database.delete(
                 NotesDatabaseHelper.TABLE_NOTE,
                 NotesDatabaseHelper.UID + " = "
