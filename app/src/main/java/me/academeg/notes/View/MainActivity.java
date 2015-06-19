@@ -1,34 +1,35 @@
 package me.academeg.notes.View;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 
 import com.melnykov.fab.FloatingActionButton;
 
-import java.io.File;
-import java.util.ArrayList;
-
 import me.academeg.notes.Control.NotesAdapter;
 import me.academeg.notes.Model.NotesDatabase;
-import me.academeg.notes.Model.NotesDatabaseHelper;
 import me.academeg.notes.R;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements LoaderCallbacks<Cursor> {
 
     private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";
     private NotesAdapter notesAdapter;
     private NotesDatabase notesDatabase;
-    private ListView notesList;
 
     private static final int REQUEST_CODE_EDIT_NOTE = 1;
     private static final int REQUEST_CODE_CREATE_NOTE = 2;
@@ -39,70 +40,68 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // connect to db
         notesDatabase = new NotesDatabase(this);
         notesDatabase.open();
-        notesList = (ListView) findViewById(R.id.notesListView);
-        fillListNotes();
-//        notesList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
-//        notesList.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-//            private boolean selectedItems[];
-//            private int countSelectedItems;
-//
-//            @Override
-//            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-//                selectedItems[position]=checked;
-//                countSelectedItems += checked ? 1 : -1;
-//                mode.setTitle(Integer.toString(countSelectedItems));
-//            }
-//
-//            @Override
-//            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-//                selectedItems=new boolean[noteArrayList.size()];
-//                for(int i=0; i<selectedItems.length; i++) selectedItems[i]=false;
-//                countSelectedItems=0;
-//                mode.getMenuInflater().inflate(R.menu.context_main, menu);
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-//                if (item.getItemId() == R.id.deleteNotes) {
-//                    SQLiteDatabase sdb = notesDatabase.getWritableDatabase();
-//                    for(int index=selectedItems.length-1; index>=0; index--) {
-//                        if (selectedItems[index]) {
-//                            removePhotos(noteArrayList.get(index).getId(), sdb);
-//                            deleteNote(noteArrayList.get(index).getId(), sdb);
-//                            noteArrayList.remove(index);
-////                            Log.d("Notes", "Note with index " + Integer.toString(index) + "was deleted.");
-//                        }
-//                    }
-//                    if (countSelectedItems > 0)
-//                        notesAdapter.notifyDataSetChanged();
-//
-//                    sdb.close();
-//                    mode.finish();
-//                }
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-//                return false;
-//            }
-//
-//            @Override
-//            public void onDestroyActionMode(ActionMode mode) {
-//
-//            }
-//        });
+        notesAdapter = new NotesAdapter(this, R.layout.item_note_list, null, 0);
+        ListView notesList = (ListView) findViewById(R.id.notesListView);
+        notesList.setAdapter(notesAdapter);
+
+        notesList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        notesList.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            private boolean selectedItems[];
+            private int countSelectedItems;
+
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                selectedItems[position]=checked;
+                countSelectedItems += checked ? 1 : -1;
+                mode.setTitle(Integer.toString(countSelectedItems));
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                selectedItems = new boolean[notesAdapter.getCount()];
+                for(int i=0; i<selectedItems.length; i++) selectedItems[i]=false;
+                countSelectedItems=0;
+                mode.getMenuInflater().inflate(R.menu.context_main, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                if (item.getItemId() == R.id.deleteNotes) {
+                    for(int index=selectedItems.length-1; index>=0; index--) {
+                        if (selectedItems[index]) {
+//                            notesDatabase.deleteNote();
+                        }
+                    }
+                    if (countSelectedItems > 0)
+                        getSupportLoaderManager().getLoader(0).forceLoad();
+
+                    mode.finish();
+                }
+                return true;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+
+            }
+        });
 
 
         notesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, ViewNoteActivity.class);
-                intent.putExtra("id",(int) id);
+                intent.putExtra("id", (int) id);
                 startActivityForResult(intent, REQUEST_CODE_EDIT_NOTE);
             }
         });
@@ -116,15 +115,9 @@ public class MainActivity extends ActionBarActivity {
                 startActivityForResult(intent, REQUEST_CODE_CREATE_NOTE);
             }
         });
-    }
 
-    private void fillListNotes() {
-        Cursor cursor = notesDatabase.getListNotes();
-        startManagingCursor(cursor);
-        notesAdapter = new NotesAdapter(this, R.layout.item_note_list, cursor, 0);
-        notesList.setAdapter(notesAdapter);
+        getSupportLoaderManager().initLoader(0, null, this);
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -134,8 +127,7 @@ public class MainActivity extends ActionBarActivity {
             if ((requestCode == REQUEST_CODE_EDIT_NOTE
                     || requestCode == REQUEST_CODE_CREATE_NOTE)
                     && data.getBooleanExtra("changes", true)) {
-                fillListNotes();
-                notesAdapter.notifyDataSetChanged();
+                getSupportLoaderManager().getLoader(0).forceLoad();
             }
         }
     }
@@ -149,7 +141,6 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -159,45 +150,60 @@ public class MainActivity extends ActionBarActivity {
         notesDatabase.close();
     }
 
-    public void removePhotos(int noteID, SQLiteDatabase sdb) {
-        ArrayList<String> photoName = new ArrayList<>();
-        Cursor cursor = sdb.query(
-                NotesDatabaseHelper.TABLE_PHOTO,
-                null,
-                "note" + NotesDatabaseHelper.UID + " = " + Integer.toString(noteID),
-                null,
-                null,
-                null,
-                null
-        );
 
-        int idPhotoName = cursor.getColumnIndex(NotesDatabaseHelper.PHOTO_NAME);
-        while (cursor.moveToNext()) {
-            photoName.add(cursor.getString(idPhotoName));
-        }
-        cursor.close();
-
-        for (String name : photoName) {
-            File deletePhotoFile = new File(PATCH_PHOTOS + name);
-            deletePhotoFile.delete();
-        }
+//  Async load notes list
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new NoteCursorLoader(this, notesDatabase);
     }
 
-    public void deleteNote(int noteID, SQLiteDatabase sdb) {
-        // delete note
-        sdb.delete(
-                NotesDatabaseHelper.TABLE_PHOTO,
-                "note" + NotesDatabaseHelper.UID + " = ?",
-                new String[]{ Integer.toString(noteID) }
-        );
-
-        // delete photos
-        sdb.delete(
-                NotesDatabaseHelper.TABLE_NOTE,
-                NotesDatabaseHelper.UID + " = "
-                        + Integer.toString(noteID),
-                null
-        );
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
     }
 
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        notesAdapter.swapCursor(data);
+    }
+
+//    public void removePhotos(int noteID, SQLiteDatabase sdb) {
+//        ArrayList<String> photoName = new ArrayList<>();
+//        Cursor cursor = sdb.query(
+//                NotesDatabaseHelper.TABLE_PHOTO,
+//                null,
+//                "note" + NotesDatabaseHelper.UID + " = " + Integer.toString(noteID),
+//                null,
+//                null,
+//                null,
+//                null
+//        );
+//
+//        int idPhotoName = cursor.getColumnIndex(NotesDatabaseHelper.PHOTO_NAME);
+//        while (cursor.moveToNext()) {
+//            photoName.add(cursor.getString(idPhotoName));
+//        }
+//        cursor.close();
+//
+//        for (String name : photoName) {
+//            File deletePhotoFile = new File(PATCH_PHOTOS + name);
+//            deletePhotoFile.delete();
+//        }
+//    }
+//
+
+
+    static class NoteCursorLoader extends CursorLoader {
+
+        private NotesDatabase notesDatabase;
+
+        public NoteCursorLoader(Context context, NotesDatabase notesDatabase) {
+            super(context);
+            this.notesDatabase = notesDatabase;
+        }
+
+        @Override
+        public Cursor loadInBackground() {
+            return notesDatabase.getListNotes();
+        }
+    }
 }
