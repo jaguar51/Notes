@@ -37,7 +37,6 @@ public class NotesAdapter extends ResourceCursorAdapter {
         return mInflater.inflate(this.layout, parent, false);
     }
 
-
     protected String cutText(String txt) {
         String res = txt.substring(0, (txt.length() < MAX_LENGTH_TEXT ? txt.length() : MAX_LENGTH_TEXT));
         res = res.replace('\n', ' ');

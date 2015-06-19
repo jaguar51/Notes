@@ -49,6 +49,30 @@ public class NotesDatabase {
         return new Note(id, c.getString(idTitle), c.getString(idText));
     }
 
+    public void deleteNote(int id) {
+//         delete note
+        database.delete(
+                NotesDatabaseHelper.TABLE_PHOTO,
+                "note" + NotesDatabaseHelper.UID + " = ?",
+                new String[]{Integer.toString(id)}
+        );
 
+//         delete photos
+        database.delete(
+                NotesDatabaseHelper.TABLE_NOTE,
+                NotesDatabaseHelper.UID + " = "
+                        + Integer.toString(id),
+                null
+        );
+    }
+
+    public Cursor getListPhotos(int noteID) {
+        return database.query(
+                NotesDatabaseHelper.TABLE_PHOTO,
+                null,
+                "note" + NotesDatabaseHelper.UID + " = " + Integer.toString(noteID),
+                null, null, null, null
+        );
+    }
 
 }
