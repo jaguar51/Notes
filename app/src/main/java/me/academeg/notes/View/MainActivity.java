@@ -20,6 +20,8 @@ import android.support.v4.content.Loader;
 
 import com.melnykov.fab.FloatingActionButton;
 
+import java.util.HashSet;
+
 import me.academeg.notes.Control.NotesAdapter;
 import me.academeg.notes.Model.NotesDatabase;
 import me.academeg.notes.R;
@@ -50,20 +52,24 @@ public class MainActivity extends ActionBarActivity implements LoaderCallbacks<C
 
         notesList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         notesList.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            private boolean selectedItems[];
+            private HashSet<Integer> selectedItems;
             private int countSelectedItems;
 
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                selectedItems[position]=checked;
+                if (checked)
+                    selectedItems.add((int) id);
+                else
+                    selectedItems.remove((int) id);
+
                 countSelectedItems += checked ? 1 : -1;
+
                 mode.setTitle(Integer.toString(countSelectedItems));
             }
 
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                selectedItems = new boolean[notesAdapter.getCount()];
-                for(int i=0; i<selectedItems.length; i++) selectedItems[i]=false;
+                selectedItems = new HashSet<Integer>();
                 countSelectedItems=0;
                 mode.getMenuInflater().inflate(R.menu.context_main, menu);
                 return true;
@@ -77,11 +83,9 @@ public class MainActivity extends ActionBarActivity implements LoaderCallbacks<C
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 if (item.getItemId() == R.id.deleteNotes) {
-                    for(int index=selectedItems.length-1; index>=0; index--) {
-                        if (selectedItems[index]) {
-//                            notesDatabase.deleteNote();
-                        }
-                    }
+                    for (int idNote : selectedItems)
+                        notesDatabase.deleteNote(idNote);
+
                     if (countSelectedItems > 0)
                         getSupportLoaderManager().getLoader(0).forceLoad();
 
@@ -148,17 +152,20 @@ public class MainActivity extends ActionBarActivity implements LoaderCallbacks<C
     protected void onDestroy() {
         super.onDestroy();
         notesDatabase.close();
+        getSupportLoaderManager().destroyLoader(0);
     }
 
 
 //  Async load notes list
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.i("loader", "create");
         return new NoteCursorLoader(this, notesDatabase);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        notesAdapter.changeCursor(null);
     }
 
     @Override
@@ -166,44 +173,19 @@ public class MainActivity extends ActionBarActivity implements LoaderCallbacks<C
         notesAdapter.swapCursor(data);
     }
 
-//    public void removePhotos(int noteID, SQLiteDatabase sdb) {
-//        ArrayList<String> photoName = new ArrayList<>();
-//        Cursor cursor = sdb.query(
-//                NotesDatabaseHelper.TABLE_PHOTO,
-//                null,
-//                "note" + NotesDatabaseHelper.UID + " = " + Integer.toString(noteID),
-//                null,
-//                null,
-//                null,
-//                null
-//        );
-//
-//        int idPhotoName = cursor.getColumnIndex(NotesDatabaseHelper.PHOTO_NAME);
-//        while (cursor.moveToNext()) {
-//            photoName.add(cursor.getString(idPhotoName));
-//        }
-//        cursor.close();
-//
-//        for (String name : photoName) {
-//            File deletePhotoFile = new File(PATCH_PHOTOS + name);
-//            deletePhotoFile.delete();
-//        }
-//    }
-//
-
 
     static class NoteCursorLoader extends CursorLoader {
 
-        private NotesDatabase notesDatabase;
+        private NotesDatabase ndb;
 
         public NoteCursorLoader(Context context, NotesDatabase notesDatabase) {
             super(context);
-            this.notesDatabase = notesDatabase;
+            ndb = notesDatabase;
         }
 
         @Override
         public Cursor loadInBackground() {
-            return notesDatabase.getListNotes();
+            return ndb.getListNotes();
         }
     }
 }

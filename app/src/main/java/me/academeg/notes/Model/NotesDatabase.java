@@ -22,8 +22,10 @@ public class NotesDatabase {
     }
 
     public void close() {
-        if (notesDatabaseHelper != null)
+        if (notesDatabaseHelper != null) {
+            database.close();
             notesDatabaseHelper.close();
+        }
     }
 
     public Cursor getListNotes() {
