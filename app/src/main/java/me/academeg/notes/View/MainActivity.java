@@ -159,7 +159,6 @@ public class MainActivity extends ActionBarActivity implements LoaderCallbacks<C
 //  Async load notes list
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.i("loader", "create");
         return new NoteCursorLoader(this, notesDatabase);
     }
 
