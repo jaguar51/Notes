@@ -4,9 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Environment;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,7 +26,7 @@ import me.academeg.notes.Model.NotesDatabase;
 import me.academeg.notes.R;
 
 
-public class MainActivity extends ActionBarActivity implements LoaderCallbacks<Cursor> {
+public class MainActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";
     private NotesAdapter notesAdapter;
@@ -69,7 +68,7 @@ public class MainActivity extends ActionBarActivity implements LoaderCallbacks<C
 
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                selectedItems = new HashSet<Integer>();
+                selectedItems = new HashSet<>();
                 countSelectedItems=0;
                 mode.getMenuInflater().inflate(R.menu.context_main, menu);
                 return true;
@@ -187,4 +186,5 @@ public class MainActivity extends ActionBarActivity implements LoaderCallbacks<C
             return ndb.getListNotes();
         }
     }
+
 }
