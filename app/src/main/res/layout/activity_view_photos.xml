@@ -14,7 +14,16 @@
         android:layout_height="match_parent"
         android:numColumns="@integer/column_count"
         android:gravity="center"
-        android:scrollbarStyle="insideOverlay" >
-    </GridView>
+        android:scrollbarStyle="insideOverlay" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/no_photos"
+        android:id="@+id/infoTxt"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"/>
+
 
 </LinearLayout>
