@@ -2,7 +2,6 @@ package me.academeg.notes.Control;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +42,7 @@ public class NotesAdapter extends ResourceCursorAdapter {
         String res =
                 txt.substring(0, (txt.length() < MAX_LENGTH_TEXT ? txt.length() : MAX_LENGTH_TEXT));
         res = res.replace('\n', ' ');
-        
+
         if (txt.length() >= MAX_LENGTH_TEXT)
             res += "...";
 

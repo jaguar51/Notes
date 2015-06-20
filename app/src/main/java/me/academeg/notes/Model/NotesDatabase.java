@@ -1,6 +1,5 @@
 package me.academeg.notes.Model;
 
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -33,6 +32,16 @@ public class NotesDatabase {
         return database.query(
                 NotesDatabaseHelper.TABLE_NOTE,
                 null, null, null, null, null,
+                NotesDatabaseHelper.UID + " DESC"
+        );
+    }
+
+    public Cursor getListNotes(int noteID) {
+        return database.query(
+                NotesDatabaseHelper.TABLE_NOTE,
+                null,
+                NotesDatabaseHelper.UID + " != " + Integer.toString(noteID),
+                null, null, null,
                 NotesDatabaseHelper.UID + " DESC"
         );
     }

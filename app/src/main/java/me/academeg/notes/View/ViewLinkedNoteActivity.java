@@ -1,9 +1,9 @@
 package me.academeg.notes.View;
 
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Pair;
@@ -15,24 +15,22 @@ import android.widget.ListView;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Scanner;
 
-import me.academeg.notes.Model.Note;
-//import me.academeg.notes.Control.NotesLinksAdapter;
+import me.academeg.notes.Control.NotesLinksAdapter;
+import me.academeg.notes.Model.NotesDatabase;
 import me.academeg.notes.Model.NotesDatabaseHelper;
 import me.academeg.notes.R;
 
 
 public class ViewLinkedNoteActivity extends ActionBarActivity {
-    private static final String FILE_NAME = "notes";
     private static final String FILE_NAME_LINKS = "links";
 
-    private NotesDatabaseHelper notesDatabase;
-
+    private NotesDatabase notesDatabase;
     private int noteID;
-    private ArrayList<Note> noteArrayList = new ArrayList<Note>();
-//    private NotesLinksAdapter notesLinksAdapter;
-    private ArrayList<Integer> thisLinks = new ArrayList<>(); // связи для нашей заметки(noteID)
+    private NotesLinksAdapter notesLinksAdapter;
+    private HashSet<Integer> thisLinks = new HashSet<>(); // связи для нашей заметки(noteID)
     private ArrayList<Pair<Integer, Integer>> linkNote = new ArrayList<Pair<Integer, Integer>>();
 
     @Override
@@ -41,24 +39,29 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
         setContentView(R.layout.activity_view_linked_note);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        notesDatabase = new NotesDatabase(this);
+        notesDatabase.open();
+
         Intent intent = getIntent();
         noteID = intent.getIntExtra("id", -1);
-
-        notesDatabase = new NotesDatabaseHelper(getApplicationContext());
-        getListNotes();
         readLinksFromFile();
 
         ListView notesList = (ListView) findViewById(R.id.linkedNotesListView);
-//        notesLinksAdapter = new NotesLinksAdapter(this, noteArrayList, thisLinks);
-//        notesList.setAdapter(notesLinksAdapter);
+        initAdapter();
+        notesList.setAdapter(notesLinksAdapter);
 
         notesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) notesLinksAdapter.getItem(position);
+                String titleNote =
+                        cursor.getString(cursor.getColumnIndex(NotesDatabaseHelper.NOTE_TITLE));
+                String textNote =
+                        cursor.getString(cursor.getColumnIndex(NotesDatabaseHelper.NOTE_TEXT));
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(ViewLinkedNoteActivity.this);
-//                Note tmpNote = notesLinksAdapter.getItem(position);
-//                builder.setTitle(tmpNote.getSubject());
-//                builder.setMessage(tmpNote.getText());
+                builder.setTitle(titleNote);
+                builder.setMessage(textNote);
                 AlertDialog alert = builder.create();
                 alert.show();
             }
@@ -93,34 +96,16 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void getListNotes() {
-        noteArrayList.clear();
+    private void initAdapter() {
+        Cursor cursor = notesDatabase.getListNotes(noteID);
+        notesLinksAdapter = new NotesLinksAdapter(getBaseContext(), R.layout.item_note_list_check,
+                cursor, 0, thisLinks);
+    }
 
-        SQLiteDatabase sdb = notesDatabase.getReadableDatabase();
-        Cursor cursor = sdb.query(
-                NotesDatabaseHelper.TABLE_NOTE,
-                null,
-                NotesDatabaseHelper.UID + " != " + Integer.toString(this.noteID),
-                null,
-                null,
-                null,
-                NotesDatabaseHelper.UID + " DESC"
-        );
-        
-        int id = cursor.getColumnIndex(NotesDatabaseHelper.UID);
-        int idTitle = cursor.getColumnIndex(NotesDatabaseHelper.NOTE_TITLE);
-        int idText = cursor.getColumnIndex(NotesDatabaseHelper.NOTE_TEXT);
-
-        while (cursor.moveToNext()) {
-            noteArrayList.add(new Note(
-                            cursor.getInt(id),
-                            cursor.getString(idTitle),
-                            cursor.getString(idText))
-            );
-        }
-
-        cursor.close();
-        sdb.close();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        notesDatabase.close();
     }
 
     public void readLinksFromFile() {
@@ -161,9 +146,9 @@ public class ViewLinkedNoteActivity extends ActionBarActivity {
                 outputLink.println(linkNote.get(i).second);
             }
 
-            for (int i = 0; i < thisLinks.size(); i++) {
-                outputLink.print(thisLinks.get(i));
-                outputLink.print(" ");
+            for (int id : thisLinks) {
+                outputLink.print(id);
+                outputLink.print(' ');
                 outputLink.println(noteID);
             }
 
