@@ -2,6 +2,7 @@ package me.academeg.notes.Control;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,8 @@ public class NotesAdapter extends ResourceCursorAdapter {
         TextView title = (TextView) view.findViewById(R.id.subjectTv);
         title.setText(cursor.getString(cursor.getColumnIndex(NotesDatabaseHelper.NOTE_TITLE)));
         TextView text = (TextView) view.findViewById(R.id.textTv);
-        text.setText(cursor.getString(cursor.getColumnIndex(NotesDatabaseHelper.NOTE_TEXT)));
+        text.setText(
+                cutText(cursor.getString(cursor.getColumnIndex(NotesDatabaseHelper.NOTE_TEXT))));
     }
 
     @Override
@@ -38,9 +40,13 @@ public class NotesAdapter extends ResourceCursorAdapter {
     }
 
     protected String cutText(String txt) {
-        String res = txt.substring(0, (txt.length() < MAX_LENGTH_TEXT ? txt.length() : MAX_LENGTH_TEXT));
+        String res =
+                txt.substring(0, (txt.length() < MAX_LENGTH_TEXT ? txt.length() : MAX_LENGTH_TEXT));
         res = res.replace('\n', ' ');
-        if (txt.length() >= MAX_LENGTH_TEXT) res += "...";
+        
+        if (txt.length() >= MAX_LENGTH_TEXT)
+            res += "...";
+
         return res;
     }
 }
