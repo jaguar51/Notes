@@ -10,25 +10,22 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Pair;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Scanner;
 
 import me.academeg.notes.Control.ImageAdapter;
-import me.academeg.notes.Model.Note;
 import me.academeg.notes.Model.NotesDatabaseHelper;
 import me.academeg.notes.R;
 
@@ -63,6 +60,11 @@ public class ViewPhotosActivity extends ActionBarActivity {
         photoGridView.setAdapter(imageAdapter);
         registerForContextMenu(photoGridView);
         photoGridView.setOnItemClickListener(gridviewOnItemClickListener);
+
+        if (imageAdapter.getCount() == 0) {
+            ((TextView) findViewById(R.id.infoTxt)).setVisibility(View.VISIBLE);
+            ((GridView) findViewById(R.id.photoGridView)).setVisibility(View.GONE);
+        }
     }
 
 
