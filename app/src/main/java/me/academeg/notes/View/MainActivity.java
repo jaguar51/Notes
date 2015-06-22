@@ -19,10 +19,12 @@ import android.support.v4.content.Loader;
 
 import com.melnykov.fab.FloatingActionButton;
 
+import java.io.File;
 import java.util.HashSet;
 
 import me.academeg.notes.Control.NotesAdapter;
 import me.academeg.notes.Model.NotesDatabase;
+import me.academeg.notes.Model.NotesDatabaseHelper;
 import me.academeg.notes.R;
 
 
@@ -82,8 +84,10 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 if (item.getItemId() == R.id.deleteNotes) {
-                    for (int idNote : selectedItems)
+                    for (int idNote : selectedItems) {
+                        deletePhotos(idNote);
                         notesDatabase.deleteNote(idNote);
+                    }
 
                     if (countSelectedItems > 0)
                         getSupportLoaderManager().getLoader(0).forceLoad();
@@ -154,6 +158,18 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
         getSupportLoaderManager().destroyLoader(0);
     }
 
+
+    public void deletePhotos(int noteID) {
+        Cursor cursor = notesDatabase.getListPhotos(noteID);
+
+        int idPhotoName = cursor.getColumnIndex(NotesDatabaseHelper.PHOTO_NAME);
+        while (cursor.moveToNext()) {
+            String fileName = cursor.getString(idPhotoName);
+            File deletePhotoFile = new File(PATCH_PHOTOS + fileName);
+            deletePhotoFile.delete();
+        }
+        cursor.close();
+    }
 
 //  Async load notes list
     @Override

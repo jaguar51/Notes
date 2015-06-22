@@ -10,6 +10,6 @@
     <string name="linksNote">Connect</string>
     <string name="addPhoto">Add picture</string>
     <string name="addedPhoto">Added pictures</string>
-    <string name="no_photos">No photos</string>
+    <string name="no_images">No images</string>
 
 </resources>

@@ -32,10 +32,11 @@ import me.academeg.notes.R;
 
 public class ViewPhotosActivity extends ActionBarActivity {
     private static final int GALLERY_REQUEST = 1;
-
     private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";
-
     private static final int CM_DELETE = 1;
+
+    private TextView messageTxtView;
+    private GridView photoGridView;
 
     private NotesDatabaseHelper notesDatabase;
     private int noteID;
@@ -54,19 +55,28 @@ public class ViewPhotosActivity extends ActionBarActivity {
         notesDatabase = new NotesDatabaseHelper(getApplicationContext());
         getPhotosName();
 
+        messageTxtView = (TextView) findViewById(R.id.infoTxt);
+        photoGridView = (GridView) findViewById(R.id.photoGridView);
+
         //Find photoList and set adapter
-        GridView photoGridView = (GridView) findViewById(R.id.photoGridView);
         imageAdapter = new ImageAdapter(this, thisPhotoName);
         photoGridView.setAdapter(imageAdapter);
         registerForContextMenu(photoGridView);
         photoGridView.setOnItemClickListener(gridviewOnItemClickListener);
 
-        if (imageAdapter.getCount() == 0) {
-            ((TextView) findViewById(R.id.infoTxt)).setVisibility(View.VISIBLE);
-            ((GridView) findViewById(R.id.photoGridView)).setVisibility(View.GONE);
-        }
+        showInfoMessage();
     }
 
+    private void showInfoMessage() {
+        if (imageAdapter.getCount() == 0) {
+            messageTxtView.setVisibility(View.VISIBLE);
+            photoGridView.setVisibility(View.GONE);
+        }
+        else {
+            messageTxtView.setVisibility(View.GONE);
+            photoGridView.setVisibility(View.VISIBLE);
+        }
+    }
 
     private void getPhotosName() {
         thisPhotoName.clear();
@@ -147,6 +157,8 @@ public class ViewPhotosActivity extends ActionBarActivity {
                 addNewPhotoToDB(fileName);
                 imageAdapter.notifyDataSetChanged();
 
+                showInfoMessage();
+
                 return;
             }
         }
@@ -207,6 +219,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
             deletePhoto(thisPhotoName.get(acmi.position));
             thisPhotoName.remove(acmi.position);
             imageAdapter.notifyDataSetChanged();
+            showInfoMessage();
             return true;
         }
 
