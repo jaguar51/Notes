@@ -105,6 +105,7 @@ public class ViewLinkedNoteActivity extends AppCompatActivity  {
     protected void onDestroy() {
         super.onDestroy();
         notesDatabase.close();
+        writeLinksToFile();
     }
 
     public void readLinksFromFile() {

@@ -61,7 +61,7 @@ public class NotesDatabase {
                 NotesDatabaseHelper.TABLE_NOTE,
                 cv,
                 NotesDatabaseHelper.UID + " = ?",
-                new String[] { Integer.toString(note.getId()) }
+                new String[]{Integer.toString(note.getId())}
         );
     }
 
@@ -98,11 +98,27 @@ public class NotesDatabase {
         );
     }
 
+
     public Cursor getListPhotos(int noteID) {
         return database.query(
                 NotesDatabaseHelper.TABLE_PHOTO, null,
                 "note" + NotesDatabaseHelper.UID + " = " + Integer.toString(noteID),
-                null, null, null, null
+                null, null, null, NotesDatabaseHelper.PHOTO_NAME + " DESC"
+        );
+    }
+
+    public void addPhoto(String name, int noteID) {
+        ContentValues cv = new ContentValues();
+        cv.put("note" + NotesDatabaseHelper.UID, noteID);
+        cv.put(NotesDatabaseHelper.PHOTO_NAME, name);
+        database.insert(NotesDatabaseHelper.TABLE_PHOTO, null, cv);
+    }
+
+    public void deletePhoto(String name) {
+        database.delete(
+                NotesDatabaseHelper.TABLE_PHOTO,
+                NotesDatabaseHelper.PHOTO_NAME + " =  ?",
+                new String[] { name }
         );
     }
 
