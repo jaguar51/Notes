@@ -1,11 +1,10 @@
 package me.academeg.notes.View;
 
-
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,7 +23,7 @@ import me.academeg.notes.Model.NotesDatabaseHelper;
 import me.academeg.notes.R;
 
 
-public class ViewLinkedNoteActivity extends ActionBarActivity {
+public class ViewLinkedNoteActivity extends AppCompatActivity  {
     private static final String FILE_NAME_LINKS = "links";
 
     private NotesDatabase notesDatabase;

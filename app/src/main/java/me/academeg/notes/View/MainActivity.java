@@ -30,7 +30,8 @@ import me.academeg.notes.R;
 
 public class MainActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";
+    private static final String PATCH_PHOTOS =
+            Environment.getExternalStorageDirectory().getPath() + "/.notes/";
     private NotesAdapter notesAdapter;
     private NotesDatabase notesDatabase;
 
@@ -57,7 +58,8 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
             private int countSelectedItems;
 
             @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+            public void onItemCheckedStateChanged(ActionMode mode, int position,
+                                                  long id, boolean checked) {
                 if (checked)
                     selectedItems.add((int) id);
                 else
@@ -113,7 +115,8 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
             }
         });
 
-        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.createNoteButton);
+        FloatingActionButton floatingActionButton =
+                (FloatingActionButton) findViewById(R.id.createNoteButton);
         floatingActionButton.attachToListView(notesList);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override

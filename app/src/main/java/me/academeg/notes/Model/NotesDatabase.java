@@ -100,8 +100,7 @@ public class NotesDatabase {
 
     public Cursor getListPhotos(int noteID) {
         return database.query(
-                NotesDatabaseHelper.TABLE_PHOTO,
-                null,
+                NotesDatabaseHelper.TABLE_PHOTO, null,
                 "note" + NotesDatabaseHelper.UID + " = " + Integer.toString(noteID),
                 null, null, null, null
         );
