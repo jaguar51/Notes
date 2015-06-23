@@ -17,7 +17,8 @@ import me.academeg.notes.Model.SquaredImageView;
 
 
 public class ImageAdapter extends BaseAdapter {
-    private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";
+    private static final String PATCH_PHOTOS =
+            Environment.getExternalStorageDirectory().getPath() + "/.notes/";
 
     private Context mContext;
     private ArrayList<String> mThumbIds;

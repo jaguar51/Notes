@@ -8,8 +8,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,7 +30,7 @@ import me.academeg.notes.Model.NotesDatabaseHelper;
 import me.academeg.notes.R;
 
 
-public class ViewPhotosActivity extends ActionBarActivity {
+public class ViewPhotosActivity extends AppCompatActivity {
     private static final int GALLERY_REQUEST = 1;
     private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";
     private static final int CM_DELETE = 1;
