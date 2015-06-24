@@ -1,6 +1,7 @@
 package me.academeg.notes.Control;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -11,8 +12,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-import java.util.ArrayList;
-
+import me.academeg.notes.Model.NotesDatabaseHelper;
 import me.academeg.notes.Model.SquaredImageView;
 
 
@@ -21,13 +21,13 @@ public class ImageAdapter extends BaseAdapter {
             Environment.getExternalStorageDirectory().getPath() + "/.notes/";
 
     private Context mContext;
-    private ArrayList<String> mThumbIds;
-
+    private Cursor mThumbIds;
     private static LruCache<String, Bitmap> mMemoryCache = null;
 
-    public ImageAdapter(Context c, ArrayList<String> arrayList) {
+
+    public ImageAdapter(Context c, Cursor cursor) {
         mContext = c;
-        mThumbIds = arrayList;
+        mThumbIds = cursor;
 
         // Get max available VM memory, exceeding this amount will throw an
         // OutOfMemory exception. Stored in kilobytes as LruCache takes an
@@ -53,12 +53,13 @@ public class ImageAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mThumbIds.size();
+        return mThumbIds.getCount();
     }
 
     @Override
     public Object getItem(int position) {
-        return mThumbIds.get(position);
+        mThumbIds.moveToPosition(position);
+        return mThumbIds.getString(mThumbIds.getColumnIndex(NotesDatabaseHelper.PHOTO_NAME));
     }
 
     @Override
@@ -94,6 +95,12 @@ public class ImageAdapter extends BaseAdapter {
         return convertView;
     }
 
+    public void changeCursor(Cursor newCursor) {
+        mThumbIds.close();
+        mThumbIds = newCursor;
+        this.notifyDataSetChanged();
+    }
+
     public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
         if (getBitmapFromMemCache(key) == null) {
             mMemoryCache.put(key, bitmap);
@@ -104,6 +111,7 @@ public class ImageAdapter extends BaseAdapter {
         return mMemoryCache.get(key);
     }
 
+//    Minimize image
     public Bitmap decodeSampledBitmapFromUri(String path, int reqWidth,
                                              int reqHeight) {
 
@@ -158,11 +166,13 @@ public class ImageAdapter extends BaseAdapter {
         @Override
         protected Bitmap doInBackground(ViewHolder... params) {
             view = params[0];
-            String bitmapName = mThumbIds.get(view.position);
+            mThumbIds.moveToPosition(view.position);
+            String bitmapName =
+                    mThumbIds.getString(mThumbIds.getColumnIndex(NotesDatabaseHelper.PHOTO_NAME));
             Bitmap bitmap = getBitmapFromMemCache(bitmapName);
             if(bitmap == null) {
                 bitmap = decodeSampledBitmapFromUri(
-                        PATCH_PHOTOS + mThumbIds.get(view.position), 250, 250);
+                        PATCH_PHOTOS + bitmapName, 250, 250);
                 addBitmapToMemoryCache(bitmapName, bitmap);
             }
             return bitmap;
