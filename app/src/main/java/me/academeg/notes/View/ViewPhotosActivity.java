@@ -16,6 +16,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import com.melnykov.fab.FloatingActionButton;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -34,6 +36,7 @@ public class ViewPhotosActivity extends AppCompatActivity {
 
     private TextView messageTxtView;
     private GridView photoGridView;
+    private FloatingActionButton floatingButton;
 
     private NotesDatabase notesDatabase;
     private int noteID;
@@ -49,9 +52,22 @@ public class ViewPhotosActivity extends AppCompatActivity {
         Intent intent = getIntent();
         noteID = intent.getIntExtra("id", -1);
 
+//        Initializing view elements
         messageTxtView = (TextView) findViewById(R.id.infoTxt);
         photoGridView = (GridView) findViewById(R.id.photoGridView);
 
+        floatingButton = (FloatingActionButton) findViewById(R.id.addPhoto);
+        floatingButton.attachToListView(photoGridView);
+        floatingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                photoPickerIntent.setType("image/*");
+                startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
+            }
+        });
+
+//        Connect to DB and set this data to photoGridView
         notesDatabase = new NotesDatabase(this);
         notesDatabase.open();
 
@@ -136,7 +152,7 @@ public class ViewPhotosActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_view_photos, menu);
+//        getMenuInflater().inflate(R.menu.menu_view_photos, menu);
         return true;
     }
 
