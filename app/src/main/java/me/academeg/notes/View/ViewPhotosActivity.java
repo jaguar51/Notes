@@ -36,7 +36,6 @@ public class ViewPhotosActivity extends AppCompatActivity {
 
     private TextView messageTxtView;
     private GridView photoGridView;
-    private FloatingActionButton floatingButton;
 
     private NotesDatabase notesDatabase;
     private int noteID;
@@ -56,7 +55,7 @@ public class ViewPhotosActivity extends AppCompatActivity {
         messageTxtView = (TextView) findViewById(R.id.infoTxt);
         photoGridView = (GridView) findViewById(R.id.photoGridView);
 
-        floatingButton = (FloatingActionButton) findViewById(R.id.addPhoto);
+        FloatingActionButton floatingButton = (FloatingActionButton) findViewById(R.id.addPhoto);
         floatingButton.attachToListView(photoGridView);
         floatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
