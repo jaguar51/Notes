@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.os.Bundle;
@@ -119,21 +120,8 @@ public class ViewPhotosActivity extends AppCompatActivity {
 
         if (resultCode == RESULT_OK) {
             if(requestCode == GALLERY_REQUEST) {
-                Bitmap galleryPic = null;
                 Uri selectedImage = imageReturnedIntent.getData();
-                try {
-                    galleryPic = MediaStore.Images.Media.getBitmap(
-                            getContentResolver(), selectedImage);
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-                String fileName = generateFileName();
-                writePhotoToCache(fileName, galleryPic);
-                notesDatabase.addPhoto(fileName, noteID);
-                imageAdapter.changeCursor(notesDatabase.getListPhotos(noteID));
-                showInfoMessage();
-
+                new ImageLoaderToCache(noteID).execute(selectedImage);
                 return;
             }
         }
@@ -194,7 +182,6 @@ public class ViewPhotosActivity extends AppCompatActivity {
             File deletePhotoFile = new File(PATCH_PHOTOS + namePhoto);
             deletePhotoFile.delete();
             notesDatabase.deletePhoto(namePhoto);
-//            imageNameList = notesDatabase.getListPhotos(noteID);
             imageAdapter.changeCursor(notesDatabase.getListPhotos(noteID));
             showInfoMessage();
             return true;
@@ -203,33 +190,78 @@ public class ViewPhotosActivity extends AppCompatActivity {
         return super.onContextItemSelected(item);
     }
 
-    //Generate name for photo, how time
-    private String generateFileName() {
-        Date dNow = new Date( );
-        SimpleDateFormat ft =
-                new SimpleDateFormat ("yyyyMMdd_HHmmss");
-        return ft.format(dNow);
-    }
 
-    private void writePhotoToCache(String fileName, Bitmap galleryPic) {
-        // Create patch for file
-        File sdPath = Environment.getExternalStorageDirectory();
-        sdPath = new File(sdPath.getAbsolutePath() + "/.notes");
-        sdPath.mkdirs();
+    class ImageLoaderToCache extends AsyncTask<Uri, Void, Void> {
 
-        File file = new File(sdPath, fileName);
-        try {
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(file);
-                galleryPic.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            } finally {
-                if (fos != null) fos.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        private int noteID;
+        private Uri selectedImage;
+        private NotesDatabase notesDB;
+
+        public ImageLoaderToCache(int noteID) {
+            this.noteID = noteID;
         }
-        //Log.d("mLogs", "Запись успешно завершена");
+
+        private void writePhotoToCache(String fileName, Bitmap galleryPic) {
+            // Create patch for file
+            File sdPath = Environment.getExternalStorageDirectory();
+            sdPath = new File(sdPath.getAbsolutePath() + "/.notes");
+            sdPath.mkdirs();
+
+            File file = new File(sdPath, fileName);
+            try {
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(file);
+                    galleryPic.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                } finally {
+                    if (fos != null) fos.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            //Log.d("mLogs", "Запись успешно завершена");
+        }
+
+        private String generateFileName() {
+            Date dNow = new Date( );
+            SimpleDateFormat ft =
+                    new SimpleDateFormat ("yyyyMMdd_HHmmss");
+            return ft.format(dNow);
+        }
+
+        @Override
+        protected Void doInBackground(Uri... params) {
+            selectedImage = params[0];
+
+            Bitmap galleryPic = null;
+            try {
+                galleryPic = MediaStore.Images.Media.getBitmap(
+                        getContentResolver(), selectedImage);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            String fileName = generateFileName();
+            writePhotoToCache(fileName, galleryPic);
+
+            notesDB = new NotesDatabase(getApplicationContext());
+            notesDB.open();
+            notesDB.addPhoto(fileName, this.noteID);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            imageAdapter.changeCursor(notesDB.getListPhotos(noteID));
+            notesDB.close();
+            try {
+                showInfoMessage();
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
 }

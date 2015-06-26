@@ -53,58 +53,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
         notesList.setAdapter(notesAdapter);
 
         notesList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        notesList.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            private HashSet<Integer> selectedItems;
-            private int countSelectedItems;
-
-            @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position,
-                                                  long id, boolean checked) {
-                if (checked)
-                    selectedItems.add((int) id);
-                else
-                    selectedItems.remove((int) id);
-
-                countSelectedItems += checked ? 1 : -1;
-
-                mode.setTitle(Integer.toString(countSelectedItems));
-            }
-
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                selectedItems = new HashSet<>();
-                countSelectedItems=0;
-                mode.getMenuInflater().inflate(R.menu.context_main, menu);
-                return true;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                if (item.getItemId() == R.id.deleteNotes) {
-                    for (int idNote : selectedItems) {
-                        deletePhotos(idNote);
-                        notesDatabase.deleteNote(idNote);
-                    }
-
-                    if (countSelectedItems > 0)
-                        getSupportLoaderManager().getLoader(0).forceLoad();
-
-                    mode.finish();
-                }
-                return true;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-
-            }
-        });
-
+        notesList.setMultiChoiceModeListener(new MultiChoiceNotesList());
 
         notesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -192,6 +141,61 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
         public Cursor loadInBackground() {
             return ndb.getListNotes();
         }
+    }
+
+
+    class MultiChoiceNotesList implements AbsListView.MultiChoiceModeListener {
+
+        private HashSet<Integer> selectedItems;
+        private int countSelectedItems;
+
+        @Override
+        public void onItemCheckedStateChanged(ActionMode mode, int position,
+                                              long id, boolean checked) {
+            if (checked)
+                selectedItems.add((int) id);
+            else
+                selectedItems.remove((int) id);
+
+            countSelectedItems += checked ? 1 : -1;
+
+            mode.setTitle(Integer.toString(countSelectedItems));
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            selectedItems = new HashSet<>();
+            countSelectedItems=0;
+            mode.getMenuInflater().inflate(R.menu.context_main, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            if (item.getItemId() == R.id.deleteNotes) {
+                for (int idNote : selectedItems) {
+                    deletePhotos(idNote);
+                    notesDatabase.deleteNote(idNote);
+                }
+
+                if (countSelectedItems > 0)
+                    getSupportLoaderManager().getLoader(0).forceLoad();
+
+                mode.finish();
+            }
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+
+        }
+
     }
 
 }
