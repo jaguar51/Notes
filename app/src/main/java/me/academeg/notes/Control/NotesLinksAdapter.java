@@ -1,71 +1,82 @@
 package me.academeg.notes.Control;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
-import me.academeg.notes.Model.Note;
+import me.academeg.notes.Model.NotesDatabaseHelper;
 import me.academeg.notes.R;
 
 
-public class NotesLinksAdapter extends NotesAdapter {
-    private ArrayList<Integer> links;
-    private long ID;
+public class NotesLinksAdapter extends ResourceCursorAdapter {
+    private static final int MAX_LENGTH_TEXT = 65;
+
+    private LayoutInflater mInflater;
+    private int layout;
+
+    private HashSet<Integer> links;
 
 
-    public NotesLinksAdapter(Context context, ArrayList<Note> notes,
-                             ArrayList<Integer> links) {
-        super(context, notes);
-        this.links = links;
-    }
-
-    public NotesLinksAdapter(Context context, ArrayList<Note> notes,
-                      ArrayList<Integer> link, long id) {
-        super(context, notes);
-        links = link;
-        ID = id;
+    public NotesLinksAdapter(Context context, int layout, Cursor c, int flags,
+                             HashSet<Integer> link) {
+        super(context, layout, c, flags);
+        this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.layout = layout;
+        this.links = link;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = lInflater.inflate(R.layout.item_note_list_check, parent, false);
-        }
-
-        Note note = getItem(position);
-
-        ((TextView)convertView.findViewById(R.id.subjectTv)).setText(cutText(note.getSubject()));
-        ((TextView)convertView.findViewById(R.id.textTv)).setText(cutText(note.getText()));
-
-        CheckBox cbBox = ((CheckBox)convertView.findViewById(R.id.cbBox));
-        for(int i = 0; i < links.size(); i++) {
-            if(note.getId() == links.get(i))
-                cbBox.setChecked(true);
-        }
-
-        cbBox.setOnCheckedChangeListener(myCheckChangList);
-        cbBox.setTag(position);
-        return convertView;
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        return mInflater.inflate(this.layout, parent, false);
     }
 
-    OnCheckedChangeListener myCheckChangList = new OnCheckedChangeListener() {
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+        TextView title = (TextView) view.findViewById(R.id.subjectTv);
+        title.setText(cursor.getString(cursor.getColumnIndex(NotesDatabaseHelper.NOTE_TITLE)));
+        TextView text = (TextView) view.findViewById(R.id.textTv);
+        text.setText(
+                cutText(cursor.getString(cursor.getColumnIndex(NotesDatabaseHelper.NOTE_TEXT))));
+        CheckBox cbBox = (CheckBox) view.findViewById(R.id.cbBox);
+        int idCurNote = cursor.getInt(cursor.getColumnIndex(NotesDatabaseHelper.UID));
+        if (links.contains(idCurNote)) {
+            cbBox.setChecked(true);
+            Log.d("checked", "true");
+        }
+        cbBox.setOnCheckedChangeListener(myCheckChangList);
+        cbBox.setTag(idCurNote);
+    }
+
+    CompoundButton.OnCheckedChangeListener myCheckChangList =
+            new CompoundButton.OnCheckedChangeListener() {
         public void onCheckedChanged(CompoundButton buttonView,
                                      boolean isChecked) {
-            int curID = getItem((Integer) buttonView.getTag()).getId();
+            int curID = (Integer) buttonView.getTag();
             if(!isChecked) {
-                for (int i = 0; i < links.size(); i++) {
-                    if (links.get(i) == curID)
-                        links.remove(i);
-                }
-            }
-            else
+                links.remove(curID);
+            } else {
                 links.add(curID);
+            }
         }
     };
+
+    protected String cutText(String txt) {
+        String res =
+                txt.substring(0, (txt.length() < MAX_LENGTH_TEXT ? txt.length() : MAX_LENGTH_TEXT));
+        res = res.replace('\n', ' ');
+
+        if (txt.length() >= MAX_LENGTH_TEXT)
+            res += "...";
+
+        return res;
+    }
 }
