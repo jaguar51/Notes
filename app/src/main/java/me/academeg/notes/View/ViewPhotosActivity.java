@@ -1,48 +1,44 @@
 package me.academeg.notes.View;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Pair;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
+
+import com.melnykov.fab.FloatingActionButton;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Scanner;
 
 import me.academeg.notes.Control.ImageAdapter;
-import me.academeg.notes.Model.Note;
-import me.academeg.notes.Model.NotesDatabaseHelper;
+import me.academeg.notes.Model.NotesDatabase;
 import me.academeg.notes.R;
 
 
-public class ViewPhotosActivity extends ActionBarActivity {
+public class ViewPhotosActivity extends AppCompatActivity {
     private static final int GALLERY_REQUEST = 1;
-
     private static final String PATCH_PHOTOS = Environment.getExternalStorageDirectory().getPath() + "/.notes/";
-
     private static final int CM_DELETE = 1;
 
-    private NotesDatabaseHelper notesDatabase;
+    private TextView messageTxtView;
+    private GridView photoGridView;
+
+    private NotesDatabase notesDatabase;
     private int noteID;
-    private ArrayList<String> thisPhotoName = new ArrayList<String>();
     private ImageAdapter imageAdapter;
 
 
@@ -54,72 +50,65 @@ public class ViewPhotosActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
         noteID = intent.getIntExtra("id", -1);
-        notesDatabase = new NotesDatabaseHelper(getApplicationContext());
-        getPhotosName();
 
+//        Initializing view elements
+        messageTxtView = (TextView) findViewById(R.id.infoTxt);
+        photoGridView = (GridView) findViewById(R.id.photoGridView);
+
+        FloatingActionButton floatingButton = (FloatingActionButton) findViewById(R.id.addPhoto);
+        floatingButton.attachToListView(photoGridView);
+        floatingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                photoPickerIntent.setType("image/*");
+                startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
+            }
+        });
+
+//        Connect to DB and set this data to photoGridView
+        notesDatabase = new NotesDatabase(this);
+        notesDatabase.open();
+
+        Cursor imageNameList = notesDatabase.getListPhotos(noteID);
         //Find photoList and set adapter
-        GridView photoGridView = (GridView) findViewById(R.id.photoGridView);
-        imageAdapter = new ImageAdapter(this, thisPhotoName);
+        imageAdapter = new ImageAdapter(this, imageNameList);
         photoGridView.setAdapter(imageAdapter);
         registerForContextMenu(photoGridView);
-        photoGridView.setOnItemClickListener(gridviewOnItemClickListener);
+        photoGridView.setOnItemClickListener(gridViewOnItemClickListener);
+
+        showInfoMessage();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        notesDatabase.close();
+    }
 
-    private void getPhotosName() {
-        thisPhotoName.clear();
-
-        SQLiteDatabase sdb = notesDatabase.getReadableDatabase();
-        Cursor cursor = sdb.query(
-                NotesDatabaseHelper.TABLE_PHOTO,
-                null,
-                "note" + NotesDatabaseHelper.UID + " = " + Integer.toString(noteID),
-                null,
-                null,
-                null,
-                NotesDatabaseHelper.PHOTO_NAME + " DESC"
-        );
-
-        int idPhotoName = cursor.getColumnIndex(NotesDatabaseHelper.PHOTO_NAME);
-        while (cursor.moveToNext()) {
-            thisPhotoName.add(cursor.getString(idPhotoName));
+    private void showInfoMessage() {
+        if (imageAdapter.getCount() == 0) {
+            messageTxtView.setVisibility(View.VISIBLE);
+            photoGridView.setVisibility(View.GONE);
         }
-
-        cursor.close();
-        sdb.close();
+        else {
+            messageTxtView.setVisibility(View.GONE);
+            photoGridView.setVisibility(View.VISIBLE);
+        }
     }
 
-    private void addNewPhotoToDB(String namePhoto) {
-        SQLiteDatabase sdb = notesDatabase.getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("note" + NotesDatabaseHelper.UID, noteID);
-        cv.put(NotesDatabaseHelper.PHOTO_NAME, namePhoto);
-        sdb.insert(NotesDatabaseHelper.TABLE_PHOTO, null, cv);
-        sdb.close();
-    }
-
-    private void deletePhoto(String namePhoto) {
-        SQLiteDatabase sdb = notesDatabase.getWritableDatabase();
-        sdb.delete(
-                NotesDatabaseHelper.TABLE_PHOTO,
-                NotesDatabaseHelper.PHOTO_NAME + " =  ?",
-                new String[] { namePhoto }
-        );
-        sdb.close();
-    }
-
-    private GridView.OnItemClickListener gridviewOnItemClickListener = new GridView.OnItemClickListener() {
+    private GridView.OnItemClickListener gridViewOnItemClickListener = new GridView.OnItemClickListener() {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View v, int position,
                                 long id) {
 
-            Intent in = new Intent();
-            in.setAction(Intent.ACTION_VIEW);
-            File sdPath = new File(PATCH_PHOTOS + thisPhotoName.get(position));
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            File sdPath = new File(PATCH_PHOTOS + imageAdapter.getItem(position));
             Uri selectImage = Uri.fromFile(sdPath);
-            in.setDataAndType(selectImage, "image/*");
-            startActivity(in);
+            intent.setDataAndType(selectImage, "image/*");
+            startActivity(intent);
         }
     };
 
@@ -141,9 +130,9 @@ public class ViewPhotosActivity extends ActionBarActivity {
                 }
                 String fileName = generateFileName();
                 writePhotoToCache(fileName, galleryPic);
-                thisPhotoName.add(0, fileName);
-                addNewPhotoToDB(fileName);
-                imageAdapter.notifyDataSetChanged();
+                notesDatabase.addPhoto(fileName, noteID);
+                imageAdapter.changeCursor(notesDatabase.getListPhotos(noteID));
+                showInfoMessage();
 
                 return;
             }
@@ -162,7 +151,7 @@ public class ViewPhotosActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_view_photos, menu);
+//        getMenuInflater().inflate(R.menu.menu_view_photos, menu);
         return true;
     }
 
@@ -200,11 +189,14 @@ public class ViewPhotosActivity extends ActionBarActivity {
             AdapterView.AdapterContextMenuInfo acmi =
                     (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
-            File deletePhotoFile = new File(PATCH_PHOTOS + thisPhotoName.get(acmi.position));
+            String namePhoto = (String) imageAdapter.getItem(acmi.position);
+
+            File deletePhotoFile = new File(PATCH_PHOTOS + namePhoto);
             deletePhotoFile.delete();
-            deletePhoto(thisPhotoName.get(acmi.position));
-            thisPhotoName.remove(acmi.position);
-            imageAdapter.notifyDataSetChanged();
+            notesDatabase.deletePhoto(namePhoto);
+//            imageNameList = notesDatabase.getListPhotos(noteID);
+            imageAdapter.changeCursor(notesDatabase.getListPhotos(noteID));
+            showInfoMessage();
             return true;
         }
 
