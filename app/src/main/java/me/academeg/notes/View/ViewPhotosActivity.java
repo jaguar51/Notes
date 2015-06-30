@@ -50,6 +50,8 @@ public class ViewPhotosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_photos);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        overridePendingTransition(R.anim.abc_fade_in, R.anim.abc_fade_out);
+
 
         Intent intent = getIntent();
         noteID = intent.getIntExtra("id", -1);
@@ -89,32 +91,12 @@ public class ViewPhotosActivity extends AppCompatActivity {
         notesDatabase.close();
     }
 
-    private void showInfoMessage() {
-        if (imageAdapter.getCount() == 0) {
-            messageTxtView.setVisibility(View.VISIBLE);
-            photoGridView.setVisibility(View.GONE);
-        }
-        else {
-            messageTxtView.setVisibility(View.GONE);
-            photoGridView.setVisibility(View.VISIBLE);
-        }
+    @Override
+    public void finish() {
+        super.finish();
+//      Transition animation out
+        overridePendingTransition(R.anim.abc_fade_in, R.anim.abc_fade_out);
     }
-
-    private GridView.OnItemClickListener gridViewOnItemClickListener = new GridView.OnItemClickListener() {
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View v, int position,
-                                long id) {
-
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_VIEW);
-            File sdPath = new File(PATCH_PHOTOS + imageAdapter.getItem(position));
-            Uri selectImage = Uri.fromFile(sdPath);
-            intent.setDataAndType(selectImage, "image/*");
-            startActivity(intent);
-        }
-    };
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
@@ -191,6 +173,32 @@ public class ViewPhotosActivity extends AppCompatActivity {
 
         return super.onContextItemSelected(item);
     }
+
+    private void showInfoMessage() {
+        if (imageAdapter.getCount() == 0) {
+            messageTxtView.setVisibility(View.VISIBLE);
+            photoGridView.setVisibility(View.GONE);
+        }
+        else {
+            messageTxtView.setVisibility(View.GONE);
+            photoGridView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private GridView.OnItemClickListener gridViewOnItemClickListener = new GridView.OnItemClickListener() {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View v, int position,
+                                long id) {
+
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            File sdPath = new File(PATCH_PHOTOS + imageAdapter.getItem(position));
+            Uri selectImage = Uri.fromFile(sdPath);
+            intent.setDataAndType(selectImage, "image/*");
+            startActivity(intent);
+        }
+    };
 
 
     class ImageLoaderToCache extends AsyncTask<Uri, Void, Void> {

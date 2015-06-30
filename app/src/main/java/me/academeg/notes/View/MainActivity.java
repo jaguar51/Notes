@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        overridePendingTransition(R.anim.abc_fade_in, R.anim.abc_fade_out);
+
 
         // connect to db
         notesDatabase = new NotesDatabase(this);
@@ -79,6 +81,20 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        notesDatabase.close();
+        getSupportLoaderManager().destroyLoader(0);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+//      Transition animation out
+        overridePendingTransition(R.anim.abc_fade_in, R.anim.abc_fade_out);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -90,14 +106,6 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<C
             }
         }
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        notesDatabase.close();
-        getSupportLoaderManager().destroyLoader(0);
-    }
-
 
     public void deletePhotos(int noteID) {
         Cursor cursor = notesDatabase.getListPhotos(noteID);

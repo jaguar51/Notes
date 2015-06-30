@@ -25,6 +25,8 @@ public class ViewNoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_note);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        overridePendingTransition(R.anim.abc_fade_in, R.anim.abc_fade_out);
+
 
         notesDatabase = new NotesDatabase(this);
         notesDatabase.open();
@@ -37,6 +39,18 @@ public class ViewNoteActivity extends AppCompatActivity {
         getNote();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        notesDatabase.close();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+//      Transition animation out
+        overridePendingTransition(R.anim.abc_fade_in, R.anim.abc_fade_out);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -87,12 +101,6 @@ public class ViewNoteActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        notesDatabase.close();
     }
 
     private void getNote() {

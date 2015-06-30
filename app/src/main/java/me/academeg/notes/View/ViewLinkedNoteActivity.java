@@ -37,6 +37,8 @@ public class ViewLinkedNoteActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_linked_note);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        overridePendingTransition(R.anim.abc_fade_in, R.anim.abc_fade_out);
+
 
         notesDatabase = new NotesDatabase(this);
         notesDatabase.open();
@@ -67,6 +69,19 @@ public class ViewLinkedNoteActivity extends AppCompatActivity  {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        notesDatabase.close();
+        writeLinksToFile();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+//      Transition animation out
+        overridePendingTransition(R.anim.abc_fade_in, R.anim.abc_fade_out);
+    }
 
     @Override
     public void onBackPressed() {
@@ -99,13 +114,6 @@ public class ViewLinkedNoteActivity extends AppCompatActivity  {
         Cursor cursor = notesDatabase.getListNotes(noteID);
         notesLinksAdapter = new NotesLinksAdapter(getBaseContext(), R.layout.item_note_list_check,
                 cursor, 0, thisLinks);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        notesDatabase.close();
-        writeLinksToFile();
     }
 
     public void readLinksFromFile() {
