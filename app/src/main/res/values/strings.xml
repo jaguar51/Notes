@@ -11,5 +11,7 @@
     <string name="addPhoto">Add picture</string>
     <string name="addedPhoto">Added pictures</string>
     <string name="no_images">No images</string>
+    <string name="loadImage">Load image</string>
+    <string name="loadImageMsg">Image loading please wait</string>
 
 </resources>

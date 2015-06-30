@@ -1,5 +1,7 @@
 package me.academeg.notes.View;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -121,7 +123,7 @@ public class ViewPhotosActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if(requestCode == GALLERY_REQUEST) {
                 Uri selectedImage = imageReturnedIntent.getData();
-                new ImageLoaderToCache(noteID).execute(selectedImage);
+                new ImageLoaderToCache(noteID, this).execute(selectedImage);
                 return;
             }
         }
@@ -196,9 +198,22 @@ public class ViewPhotosActivity extends AppCompatActivity {
         private int noteID;
         private Uri selectedImage;
         private NotesDatabase notesDB;
+        private Context mContext;
+        private ProgressDialog progressDialog;
 
-        public ImageLoaderToCache(int noteID) {
+
+        public ImageLoaderToCache(int noteID, Context context) {
             this.noteID = noteID;
+            this.mContext = context;
+            progressDialog = new ProgressDialog(mContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog.setTitle(R.string.loadImage);
+            progressDialog.setMessage(getString(R.string.loadImageMsg));
+            progressDialog.show();
         }
 
         private void writePhotoToCache(String fileName, Bitmap galleryPic) {
@@ -261,6 +276,7 @@ public class ViewPhotosActivity extends AppCompatActivity {
             catch (Exception ex) {
                 ex.printStackTrace();
             }
+            progressDialog.cancel();
         }
     }
 

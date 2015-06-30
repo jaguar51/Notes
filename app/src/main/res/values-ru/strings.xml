@@ -10,5 +10,7 @@
     <string name="addedPhoto">Прикрепленные картинки</string>
     <string name="delete">Удалить</string>
     <string name="no_images">Нет изображений</string>
+    <string name="loadImage">Загрузка изображения</string>
+    <string name="loadImageMsg">Изображение загружается пожалуйста подождите</string>
 
 </resources>
